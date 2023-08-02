@@ -1,9 +1,10 @@
 import piece
+import pyffish
 
 
 class Board:
     def __init__(self):
-        self.DEFAULT_BOARD = ""  # default starting position in fen.
+        self.START_BOARD = pyffish.start_fen('losalamos')  # default starting position in fen.
         self.board = ""  # fen string?
 
     def make_move(self, start, end):
