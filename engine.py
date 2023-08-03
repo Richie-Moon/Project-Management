@@ -7,6 +7,8 @@ from typing import Generator, Any
 
 
 class Engine:
+    engine_vars = {'depth': int}
+
     def __init__(self, path: list) -> None:
         self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE,
@@ -22,6 +24,10 @@ class Engine:
     def read(self) -> Generator[str, Any, None]:
         while self.process.poll() is None:
             yield self.process.stdout.readline()
+
+    @classmethod
+    def parse(cls):
+        x = cls.engine_vars['depth']
 
 
 engine = Engine(["fairy-stockfish_x86-64-bmi2"])

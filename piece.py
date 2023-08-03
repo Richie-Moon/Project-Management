@@ -23,8 +23,5 @@ class Pawn(Piece):
         if self.side == 'white':
             moves = []
             moves.append(self.file + str(self.rank + 1))
-            # Double push pawns if they haven't moved.
-            if self.starting_rank == self.rank:
-                moves.append(self.file + str(self.rank + 2))
 
             return moves
