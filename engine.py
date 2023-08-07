@@ -2,6 +2,7 @@ import subprocess
 import pyffish
 import threading
 from typing import Generator, Any
+import time
 
 # https://github.com/fairy-stockfish/FairyFishGUI/blob/main/fairyfishgui.py
 
@@ -25,17 +26,32 @@ class Engine:
         while self.process.poll() is None:
             yield self.process.stdout.readline()
 
+    def new_game(self) -> None:
+        self.write("ucinewgame\n")
+        self.write("setoption name UCI_Variant value losalamos\n")
+        self.write(f"position startpos\n")
+
+    def change_elo(self, elo: int):
+        self.write("")
+
     @classmethod
-    def parse(cls):
-        x = cls.engine_vars['depth']
+    def parse(cls, line: str):
+        items = line.split()
+
+        if len(items) == 1:
+            pass
 
 
 engine = Engine(["fairy-stockfish_x86-64-bmi2"])
-engine.write("ucinewgame\n")
-engine.write("setoption name UCI_Variant value losalamos\n")
-engine.write(f"position startpos\n")
-engine.write("d\n")
+engine.new_game()
 engine.write('go movetime 2000\n')
+time.sleep(3)
 
 for i in engine.read():
     print(i)
+    try:
+        if i.split()[0] == 'bestmove':
+            print(i)
+    except IndexError:
+        pass
+

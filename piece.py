@@ -1,27 +1,60 @@
-import board
-
-
 class Piece:
-    def __init__(self, piece_type, side):
-        self.type = piece_type
-        self.side = side
-        self.file = 'e'
-        self.rank = 5  # Get this info from board class/method
+    def __init__(self, letter: str, file: int, rank: int):
+        self.letter = letter
+        self.file = file
+        self.rank = rank
 
-        self.starting_file = 'e'
-        if self.type == 'white':
-            self.starting_rank = 2
-        elif self.type == 'black':
-            self.starting_rank = 6
+        # do I even need this idk
+        # if self.letter.isupper():
+        #     self.starting_rank = 0  # Default for all pieces other than pawns.
+        # elif self.letter.islower():
+        #     self.starting_rank = 7
 
 
 class Pawn(Piece):
-    def __init__(self):
-        super().__init__("pawn", "white")
+    def __init__(self, letter: str, file: int, rank: int):
+        super().__init__(letter, file, rank)
+        self.starting_rank = 1
 
     def valid_moves(self) -> list:
-        if self.side == 'white':
+        if self.letter.isupper():
             moves = []
-            moves.append(self.file + str(self.rank + 1))
-
+            # do da stuff
             return moves
+
+
+class Knight(Piece):
+    def __init__(self, letter: str, file: int, rank: int):
+        super().__init__(letter, file, rank)
+
+    def valid_moves(self) -> list:
+        moves = []
+        return moves
+
+
+class Rook(Piece):
+    def __init__(self, letter: str, file: int, rank: int):
+        super().__init__(letter, file, rank)
+
+    def valid_moves(self) -> list:
+        moves = []
+        return moves
+
+
+class Queen(Piece):
+    def __init__(self, letter: str, file: int, rank: int):
+        super().__init__(letter, file, rank)
+
+    def valid_moves(self) -> list:
+        moves = []
+        return moves
+
+
+class King(Piece):
+    def __init__(self, letter: str, file: int, rank: int):
+        super().__init__(letter, file, rank)
+
+    def valid_moves(self) -> list:
+        moves = []
+        return moves
+
