@@ -6,9 +6,9 @@ class Piece:
 
         # do I even need this idk
         # if self.letter.isupper():
-        #     self.starting_rank = 0  # Default for all pieces other than pawns.
+        #   self.starting_rank = 0  # Default for all pieces other than pawns.
         # elif self.letter.islower():
-        #     self.starting_rank = 7
+        #     self.starting_rank = 5
 
 
 class Pawn(Piece):
