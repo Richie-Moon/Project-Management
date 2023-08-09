@@ -1,6 +1,7 @@
 import pyffish
 import piece
 from typing import Type
+import engine
 
 
 class Board:
@@ -18,9 +19,13 @@ class Board:
         self.MAX_FILE = 6
         self.MAX_RANK = 6
 
+        self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
+
     def new_game(self) -> None:
         self.board = []
         self.moves = []
+
+        self.engine.new_game()
 
         # Splits the extra info off from the end of the fen
         split_fen = self.START_BOARD.split(' ')
@@ -42,8 +47,7 @@ class Board:
 
             self.board.append(rank_list)
 
-    def make_move(self, start, end) -> None:
-        # convert to fen changes?
+    def update_board(self):
         pass
 
     def on_square(self, file, rank) -> Type[piece.Piece] | None:

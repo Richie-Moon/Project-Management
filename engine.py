@@ -15,7 +15,7 @@ class Engine:
                                         stdout=subprocess.PIPE,
                                         universal_newlines=True)
         self.lock = threading.Lock()
-        # self.write('uci\n')  Parse the engine response first.
+        self.write('uci\n')
 
     def write(self, message: str) -> None:
         with self.lock:
