@@ -34,24 +34,22 @@ class Engine:
     def change_elo(self, elo: int):
         self.write("")
 
-    @classmethod
-    def parse(cls, line: str):
-        items = line.split()
-
-        if len(items) == 1:
-            pass
+    def response(self, phrase: str):
+        for line in self.read():
+            if phrase in line:
+                return line
 
 
-engine = Engine(["fairy-stockfish_x86-64-bmi2"])
-engine.new_game()
-engine.write('go movetime 2000\n')
-time.sleep(3)
-
-for i in engine.read():
-    print(i)
-    try:
-        if i.split()[0] == 'bestmove':
-            print(i)
-    except IndexError:
-        pass
+# engine = Engine(["fairy-stockfish_x86-64-bmi2"])
+# engine.new_game()
+# engine.write('go movetime 2000\n')
+# time.sleep(3)
+#
+# for i in engine.read():
+#     print(i)
+#     try:
+#         if i.split()[0] == 'bestmove':
+#             print(i)
+#     except IndexError:
+#         pass
 

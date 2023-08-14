@@ -12,7 +12,7 @@ if sys.platform == "win32":
     SW_MAXIMIZE = 3
     ctypes.windll.user32.ShowWindow(HWND, SW_MAXIMIZE)
 
-bg = pygame.image.load("assets/BGimage.png")
+bg = pygame.image.load("assets/chess_bg.jpg")
 
 
 def main_menu():
@@ -22,6 +22,10 @@ def main_menu():
         mouse_pos = pygame.mouse.get_pos()
         screen.blit(bg, (0, 0))
         pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
 
 main_menu()
