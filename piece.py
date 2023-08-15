@@ -3,7 +3,6 @@ class Piece:
         self.letter = letter
         self.file = file  # 0-5
         self.rank = rank  # 0-5
-        self.num_to_file = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f'}
 
         self.LEFT = False
         self.RIGHT = False
@@ -25,8 +24,8 @@ class Piece:
         elif self.rank == self.MAX_RANK:
             self.TOP = True
 
-    def square(self):
-        return self.num_to_file[self.file] + str(self.rank + 1)
+    def square(self) -> tuple[int, int]:
+        return self.file, self.rank
 
     # def print_info(self):
     #     print(self.file)
@@ -51,19 +50,20 @@ class Pawn(Piece):
 
         on_next_square = board.on_square(*next_square)
 
-        if on_next_square is None:  # TODO change this
-            moves.append(self.num_to_file[self.file] + str(self.rank + 2))
+        if on_next_square is None:
+            moves.append(next_square)
 
         # Skip checking for captures on left/right if the piece is on the
         # left/right most file.
         if not self.LEFT:
             on_left = board.on_square(*left)
-            if on_left:
-                moves.append((self.file - 1, self.rank + 2))
+            # If there is a piece and the piece is not the same colour.
+            if on_left and on_left.letter.isupper() is not self.letter.isupper():
+                moves.append(left)
         if not self.RIGHT:
             on_right = board.on_square(*right)
-            if on_right:
-                moves.append(self.num_to_file[self.file + 1] + str(self.rank + 2))
+            if on_right and on_right.letter.isupper() is not self.letter.isupper():
+                moves.append(right)
 
         return moves
 

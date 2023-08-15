@@ -1,12 +1,17 @@
 import board
+import pyffish
 
-fen = "rnqknr/p1pppp/1p4/1P4/P1PPPP/RNQKNR w - - 0 1"
+fen = "rnqknr/pp1ppp/2p3/1P1P2/P1P1PP/RNQKNR b - - 0 2"
+# fen = pyffish.start_fen('losalamos')
 
 b = board.Board()
 b.fen_to_board(fen)
 
-piece = b.on_square(1, 2)
-print("Start square: " + piece.square())
+piece = b.on_square(2, 3)
+print("Start square: " + b.coords_to_square(*piece.square()))
 
-print(piece.valid_moves(b))
+moves = piece.valid_moves(b)
+print(moves)
+for square in moves:
+    print(b.coords_to_square(*square))
 
