@@ -12,7 +12,21 @@ if sys.platform == "win32":
     SW_MAXIMIZE = 3
     ctypes.windll.user32.ShowWindow(HWND, SW_MAXIMIZE)
 
-bg = pygame.image.load("assets/chess_bg.jpg")
+info = pygame.display.Info()
+h = info.current_h
+w = info.current_w
+
+bg = pygame.image.load("assets/bg.jpg")
+
+
+# https://stackoverflow.com/questions/20002242/how-to-scale-images-to-screen-size-in-pygame
+def transformScaleKeepRatio(image, size):
+    iwidth, iheight = image.get_size()
+    scale = max(size[0] / iwidth, size[1] / iheight)
+    new_size = (round(iwidth * scale), round(iheight * scale))
+    scaled_image = pygame.transform.smoothscale(image, new_size)
+    image_rect = scaled_image.get_rect(center = (size[0] // 2, size[1] // 2))
+    return scaled_image, image_rect
 
 
 def main_menu():
@@ -20,13 +34,14 @@ def main_menu():
         pygame.display.set_caption("Mini Chess")
 
         mouse_pos = pygame.mouse.get_pos()
-        screen.blit(bg, (0, 0))
-        pygame.display.update()
+        image, rect = transformScaleKeepRatio(bg, (w, h))
+        screen.blit(image, rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
+        pygame.display.update()
 
 main_menu()
 

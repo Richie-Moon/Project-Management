@@ -9,3 +9,5 @@ Los Alamos Chess Variant
 [UCI Commands Gist](https://gist.github.com/DOBRO/2592c6dad754ba67e6dcaec8c90165bf)
 
 [Image License](https://pixabay.com/service/license-summary/)
+
+[GUI Guide](https://github.com/baraltech/Menu-System-PyGame)
