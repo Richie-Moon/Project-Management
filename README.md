@@ -10,4 +10,8 @@ Los Alamos Chess Variant
 
 [Image License](https://pixabay.com/service/license-summary/)
 
+[Background Images](https://www.chess.com/terms/chess-background)
+
 [GUI Guide](https://github.com/baraltech/Menu-System-PyGame)
+
+[Font](https://fonts.google.com/specimen/Ruwudu?preview.text=Mini%20Chess&preview.text_type=custom)
