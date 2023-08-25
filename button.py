@@ -13,6 +13,17 @@ class Button:
                  bg_hover_colour: tuple[int, int, int],
                  screen_width: float,
                  transparent: bool) -> None:
+        """
+        :param pos: Position of button on screen.
+        :param text_input: Text to display on button.
+        :param font: pygame.font.Font instance of the font size and style.
+        :param base_colour: Non-hover text colour.
+        :param hover_colour: Hover text colour.
+        :param bg_base_colour: Non-hover background colour
+        :param bg_hover_colour: Hover background colour
+        :param screen_width: Width of screen
+        :param transparent: Whether the button bg is transparent.
+        """
         self.x_pos = pos[0]
         self.y_pos = pos[1]
         self.font = font
@@ -30,8 +41,6 @@ class Button:
         self.rect.update(screen_width // 2 - WIDTH // 2,
                          self.text_rect.top - BORDER, WIDTH, h)
 
-        print(self.rect.height)
-
         self.OPACITY = 85  # 255//3 = 85. 255 is the max opacity value.
 
         self.bg = pygame.Surface(self.rect.size, pygame.SRCALPHA)
@@ -39,16 +48,28 @@ class Button:
             self.bg.set_alpha(self.OPACITY)
 
     def update(self, screen: pygame.Surface) -> None:
+        """
+        Blits the button background and button text onto the screen.
+        """
         screen.blit(self.bg, self.rect)
         screen.blit(self.text, self.text_rect)
 
     def check_position(self, position: tuple[int, int]) -> bool:
+        """
+        Parameter position: (x, y).
+        Returns True if the position given is inside the button rectangle.
+        """
         if (position[0] in range(self.rect.left, self.rect.right) and
                 position[1] in range(self.rect.top, self.rect.bottom)):
             return True
         return False
 
     def change_colour(self, position: tuple[int, int]) -> None:
+        """
+        Checks if position is inside button. If it is, change the text and bg
+        colours to their hovering colours. Else, change the colour to base
+        colours.
+        """
         if self.check_position(position):
             self.text = self.font.render(self.text_input, True,
                                          self.hovering_colour)

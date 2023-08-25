@@ -173,14 +173,31 @@ def settings() -> None:
                          bg_hover_colour=BUTTON_HOVER_COLOUR,
                          screen_width=w,
                          transparent=True)
+
+    play_button = Button(pos=(w * HALF, h * HALF), text_input="PLAY",
+                         font=get_font(75, "Bold"),
+                         base_colour=TEXT_BASE_COLOUR,
+                         hover_colour=TEXT_HOVER_COLOUR,
+                         bg_base_colour=BUTTON_BASE_COLOUR,
+                         bg_hover_colour=BUTTON_HOVER_COLOUR,
+                         screen_width=w,
+                         transparent=True)
     pygame.display.update()
 
     while True:
-        moouse_pos = pygame.mouse.get_pos()
+        mouse_pos = pygame.mouse.get_pos()
+
+        back_button.change_colour(mouse_pos)
+        back_button.update(screen)
+
+        play_button.change_colour(mouse_pos)
+        play_button.update(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+
+        pygame.display.update()
 
 
 def tutorial():
