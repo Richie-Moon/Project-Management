@@ -190,7 +190,8 @@ def settings(from_play: bool) -> None:
     pygame.display.set_caption("Settings")
 
     if from_play:
-        play_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE),
+        play_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE +
+                                  BUTTON_GAP),
                              text_input="PLAY",
                              font=get_font(BUTTON_TEXT_SIZE, "Medium"),
                              base_colour=TEXT_BASE_COLOUR,
@@ -201,7 +202,8 @@ def settings(from_play: bool) -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
     elif not from_play:
-        done_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE),
+        done_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE +
+                                  BUTTON_GAP),
                              text_input="Done",
                              font=get_font(BUTTON_TEXT_SIZE, "Medium"),
                              base_colour=TEXT_BASE_COLOUR,
