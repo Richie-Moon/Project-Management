@@ -44,6 +44,7 @@ class Button:
         self.OPACITY = 85  # 255//3 = 85. 255 is the max opacity value.
 
         self.bg = pygame.Surface(self.rect.size, pygame.SRCALPHA)
+
         if transparent:
             self.bg.set_alpha(self.OPACITY)
 
@@ -56,7 +57,7 @@ class Button:
 
     def check_position(self, position: tuple[int, int]) -> bool:
         """
-        Parameter position: (x, y).
+        :param position: (x, y).
         Returns True if the position given is inside the button rectangle.
         """
         if (position[0] in range(self.rect.left, self.rect.right) and

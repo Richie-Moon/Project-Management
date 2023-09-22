@@ -19,7 +19,7 @@ class Engine:
         # Initialise the engine.
         self.write('uci\n')
 
-        self.DEFUALT_ELO: int = 1000  # TODO this is a temp value.
+        self.DEFAULT_ELO: int = 1000  # TODO this is a temp value.
         self.moves = []
 
     def write(self, message: str) -> None:
@@ -42,7 +42,7 @@ class Engine:
         self.write(f"position startpos\n")
 
         self.write("setoption name UCI_LimitStrength value true")
-        self.change_elo(self.DEFUALT_ELO)
+        self.change_elo(self.DEFAULT_ELO)
 
     def change_elo(self, elo: int) -> None:
         """

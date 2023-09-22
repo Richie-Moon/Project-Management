@@ -50,8 +50,9 @@ def get_font(size: int,
              style: Literal["Bold", "Medium", "Regular", "SemiBold"] =
              "Regular") -> pygame.font.Font:
     """
-    Loads the Ruwudu font used for the game. Size is the size of the font,
-    and style is the thickness of the letters, defaults to regular.
+    :param size: Size of the font.
+    :param style: Thickness of the font. Must be one of 'Bold', 'Medium',
+     'Regular' or 'SemiBold'. Defaults to 'Regular'.
     """
 
     style = style.capitalize()
@@ -95,6 +96,16 @@ def display_title() -> None:
 
 
 blurred_bg_scaled, blurred_bg_rect = scale_image(blurred_bg, (w, h))
+
+back_button = Button(pos=(150, 100), text_input="Back",
+                     font=get_font(50, "SemiBold"),
+                     base_colour=TEXT_BASE_COLOUR,
+                     hover_colour=TEXT_HOVER_COLOUR,
+                     bg_base_colour=BUTTON_BASE_COLOUR,
+                     bg_hover_colour=BUTTON_HOVER_COLOUR,
+                     width=250,
+                     height=100,
+                     transparent=True)
 
 
 def main_menu() -> None:
@@ -143,8 +154,6 @@ def main_menu() -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
-    pygame.display.update()
-
     while True:
         pygame.display.set_caption("Mini Chess")
 
@@ -167,43 +176,43 @@ def main_menu() -> None:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 if play_button.check_position(mouse_pos) is True:
-                    settings_from_play()
+                    settings(from_play=True)
                 elif tutorial_button.check_position(mouse_pos) is True:
                     tutorial()
                 elif settings_button.check_position(mouse_pos) is True:
-                    settings()
+                    settings(from_play=False)
 
         pygame.display.update()
 
 
-def settings_from_play() -> None:
+def settings(from_play: bool) -> None:
     screen.fill(BLACK)
+    pygame.display.set_caption("Settings")
 
-    back_button = Button(pos=(150, 100), text_input="Back",
-                         font=get_font(50, "SemiBold"),
-                         base_colour=TEXT_BASE_COLOUR,
-                         hover_colour=TEXT_HOVER_COLOUR,
-                         bg_base_colour=BUTTON_BASE_COLOUR,
-                         bg_hover_colour=BUTTON_HOVER_COLOUR,
-                         width=250,
-                         height=100,
-                         transparent=True)
-
-    play_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE),
-                         text_input="PLAY",
-                         font=get_font(BUTTON_TEXT_SIZE, "Medium"),
-                         base_colour=TEXT_BASE_COLOUR,
-                         hover_colour=TEXT_HOVER_COLOUR,
-                         bg_base_colour=BUTTON_BASE_COLOUR,
-                         bg_hover_colour=BUTTON_HOVER_COLOUR,
-                         width=MENU_BUTTON_WIDTH,
-                         height=MENU_BUTTON_HEIGHT,
-                         transparent=True)
-    pygame.display.update()
+    if from_play:
+        play_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE),
+                             text_input="PLAY",
+                             font=get_font(BUTTON_TEXT_SIZE, "Medium"),
+                             base_colour=TEXT_BASE_COLOUR,
+                             hover_colour=TEXT_HOVER_COLOUR,
+                             bg_base_colour=BUTTON_BASE_COLOUR,
+                             bg_hover_colour=BUTTON_HOVER_COLOUR,
+                             width=MENU_BUTTON_WIDTH,
+                             height=MENU_BUTTON_HEIGHT,
+                             transparent=True)
+    elif not from_play:
+        done_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE),
+                             text_input="Done",
+                             font=get_font(BUTTON_TEXT_SIZE, "Medium"),
+                             base_colour=TEXT_BASE_COLOUR,
+                             hover_colour=TEXT_HOVER_COLOUR,
+                             bg_base_colour=BUTTON_BASE_COLOUR,
+                             bg_hover_colour=BUTTON_HOVER_COLOUR,
+                             width=MENU_BUTTON_WIDTH,
+                             height=MENU_BUTTON_HEIGHT,
+                             transparent=True)
 
     while True:
-        pygame.display.set_caption("Settings from play")
-
         screen.blit(blurred_bg_scaled, blurred_bg_rect)
 
         mouse_pos = pygame.mouse.get_pos()
@@ -211,8 +220,12 @@ def settings_from_play() -> None:
         back_button.change_colour(mouse_pos)
         back_button.update(screen)
 
-        play_button.change_colour(mouse_pos)
-        play_button.update(screen)
+        if from_play:
+            play_button.change_colour(mouse_pos)
+            play_button.update(screen)
+        elif not from_play:
+            done_button.change_colour(mouse_pos)
+            done_button.update(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -220,53 +233,12 @@ def settings_from_play() -> None:
             if event.type == pygame.MOUSEBUTTONUP:
                 if back_button.check_position(mouse_pos) is True:
                     return
-                elif play_button.check_position(mouse_pos) is True:
+                elif from_play and play_button.check_position(mouse_pos) \
+                        is True:
                     play()
                     return
-
-        pygame.display.update()
-
-
-def settings() -> None:
-    screen.fill(BLACK)
-    screen.blit(blurred_bg_scaled, blurred_bg_rect)
-
-    back_button = Button(pos=(100, 100), text_input="Back",
-                         font=get_font(50, "SemiBold"),
-                         base_colour=TEXT_BASE_COLOUR,
-                         hover_colour=TEXT_HOVER_COLOUR,
-                         bg_base_colour=BUTTON_BASE_COLOUR,
-                         bg_hover_colour=BUTTON_HOVER_COLOUR,
-                         width=250,
-                         height=100,
-                         transparent=True)
-
-    done_button = Button(pos=(w * HALF, h * HALF), text_input="Done",
-                         font=get_font(75, "Bold"),
-                         base_colour=TEXT_BASE_COLOUR,
-                         hover_colour=TEXT_HOVER_COLOUR,
-                         bg_base_colour=BUTTON_BASE_COLOUR,
-                         bg_hover_colour=BUTTON_HOVER_COLOUR,
-                         width=MENU_BUTTON_WIDTH,
-                         height=MENU_BUTTON_HEIGHT,
-                         transparent=True)
-
-    pygame.display.update()
-
-    while True:
-        pygame.display.set_caption("Settings")
-
-        mouse_pos = pygame.mouse.get_pos()
-
-        back_button.change_colour(mouse_pos)
-        back_button.update(screen)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            if event.type == pygame.MOUSEBUTTONUP:
-                if (back_button.check_position(mouse_pos) is True or
-                        done_button.check_position(mouse_pos) is True):
+                elif not from_play and done_button.check_position(mouse_pos) \
+                        is True:
                     return
 
         pygame.display.update()
@@ -279,12 +251,14 @@ def tutorial():
     """
     screen.fill(BLACK)
     screen.blit(blurred_bg_scaled, blurred_bg_rect)
+    pygame.display.set_caption("Tutorial")
 
     while True:
-        pygame.display.set_caption("Tutorial")
-
         mouse_pos = pygame.mouse.get_pos()
-    pass
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
 
 def play() -> None:
@@ -302,12 +276,10 @@ def play() -> None:
         # TODO this is temporary
         play_text = get_font(50).render("This is the PLAY screen.",
                                         True, "white")
-        screen.blit(play_text, play_text.get_rect(center=(w//2, h//2)))
+        screen.blit(play_text, play_text.get_rect(center=(w // 2, h // 2)))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
         pygame.display.update()
-
-
