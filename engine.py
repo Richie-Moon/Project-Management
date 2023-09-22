@@ -15,7 +15,12 @@ class Engine:
                                         stdout=subprocess.PIPE,
                                         universal_newlines=True)
         self.lock = threading.Lock()
+
+        # Initialise the engine.
         self.write('uci\n')
+
+        self.DEFUALT_ELO: int = 1000  # TODO this is a temp value.
+        self.moves = []
 
     def write(self, message: str) -> None:
         with self.lock:
@@ -27,29 +32,47 @@ class Engine:
             yield self.process.stdout.readline()
 
     def new_game(self) -> None:
+        """
+        Starts a new game. Initialises the engine: sets variant to losalamos,
+        sets the position to the startpos and sets engine elo to default.
+        """
+
         self.write("ucinewgame\n")
         self.write("setoption name UCI_Variant value losalamos\n")
         self.write(f"position startpos\n")
 
-    def change_elo(self, elo: int):
-        self.write("")
+        self.write("setoption name UCI_LimitStrength value true")
+        self.change_elo(self.DEFUALT_ELO)
+
+    def change_elo(self, elo: int) -> None:
+        """
+        Changes the elo strength of the engine.
+        :param elo: The elo that the engine should play at. Must be between
+        500 and 2850
+        """
+        self.write(f"setoption UCI_Elo value {elo}")
+
+    def get_position(self) -> str:
+        self.write("d\n")
+        line = self.response("Fen: ")
+        return line.split(" ", 1)[1]
 
     def response(self, phrase: str):
         for line in self.read():
             if phrase in line:
                 return line
 
+    def move(self, fen: str, move: str):
+        """
+        :param fen: The current board in FEN notation.
+        :param move: The move to make on the board, given in LAN
+        (Long Algebraic Notation).
+        """
+        self.write(f"position {fen} moves {move}")
 
 # engine = Engine(["fairy-stockfish_x86-64-bmi2"])
 # engine.new_game()
 # engine.write('go movetime 2000\n')
 # time.sleep(3)
 #
-# for i in engine.read():
-#     print(i)
-#     try:
-#         if i.split()[0] == 'bestmove':
-#             print(i)
-#     except IndexError:
-#         pass
-
+# print(engine.get_position())

@@ -1,7 +1,6 @@
 import pygame
-BORDER: int = 30
 DOUBLE = 2
-WIDTH = 530
+ADJUST = 20
 
 
 class Button:
@@ -11,7 +10,7 @@ class Button:
                  hover_colour: tuple[int, int, int],
                  bg_base_colour: tuple[int, int, int],
                  bg_hover_colour: tuple[int, int, int],
-                 screen_width: float,
+                 width: int, height: int,
                  transparent: bool) -> None:
         """
         :param pos: Position of button on screen.
@@ -21,7 +20,8 @@ class Button:
         :param hover_colour: Hover text colour.
         :param bg_base_colour: Non-hover background colour
         :param bg_hover_colour: Hover background colour
-        :param screen_width: Width of screen
+        :param width: Width of button
+        :param height: Height of button
         :param transparent: Whether the button bg is transparent.
         """
         self.x_pos = pos[0]
@@ -37,9 +37,9 @@ class Button:
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
         self.rect = self.text_rect.copy()
 
-        h = self.text_rect.height
-        self.rect.update(screen_width // 2 - WIDTH // 2,
-                         self.text_rect.top - BORDER, WIDTH, h)
+        self.rect.update(self.x_pos - width // DOUBLE,
+                         self.y_pos - height // DOUBLE - width // ADJUST,
+                         width, height)
 
         self.OPACITY = 85  # 255//3 = 85. 255 is the max opacity value.
 

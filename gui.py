@@ -23,6 +23,10 @@ BUTTON_GAP: int = 40
 HALF: float = 0.5
 DOUBLE: int = 2
 HEIGHT: int = 160
+MENU_BUTTON_WIDTH: int = 530
+MENU_BUTTON_HEIGHT: int = 150
+
+board = board.Board()
 
 pygame.init()
 
@@ -39,6 +43,7 @@ h = info.current_h
 w = info.current_w
 
 bg = pygame.image.load("assets/bg.jpg")
+blurred_bg = pygame.image.load("assets/bg_blurred.png")
 
 
 def get_font(size: int,
@@ -89,12 +94,14 @@ def display_title() -> None:
     screen.blit(title_text_2, title_2_rect)
 
 
+blurred_bg_scaled, blurred_bg_rect = scale_image(blurred_bg, (w, h))
+
+
 def main_menu() -> None:
     """
     Displays the main menu. Has the play, settings and tutorial button.
     """
     screen.fill(BLACK)
-    pygame.display.set_caption("Mini Chess")
 
     # Set scaled background image.
     bg_scaled, rect = scale_image(bg, (w, h))
@@ -107,7 +114,8 @@ def main_menu() -> None:
                          hover_colour=TEXT_HOVER_COLOUR,
                          bg_base_colour=BUTTON_BASE_COLOUR,
                          bg_hover_colour=BUTTON_HOVER_COLOUR,
-                         screen_width=w,
+                         width=MENU_BUTTON_WIDTH,
+                         height=MENU_BUTTON_HEIGHT,
                          transparent=True)
 
     # Tutorial button
@@ -118,7 +126,8 @@ def main_menu() -> None:
                              hover_colour=TEXT_HOVER_COLOUR,
                              bg_base_colour=BUTTON_BASE_COLOUR,
                              bg_hover_colour=BUTTON_HOVER_COLOUR,
-                             screen_width=w,
+                             width=MENU_BUTTON_WIDTH,
+                             height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
     # Settings button
@@ -130,12 +139,15 @@ def main_menu() -> None:
                              hover_colour=TEXT_HOVER_COLOUR,
                              bg_base_colour=BUTTON_BASE_COLOUR,
                              bg_hover_colour=BUTTON_HOVER_COLOUR,
-                             screen_width=w,
+                             width=MENU_BUTTON_WIDTH,
+                             height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
     pygame.display.update()
 
     while True:
+        pygame.display.set_caption("Mini Chess")
+
         mouse_pos = pygame.mouse.get_pos()
         screen.blit(bg_scaled, rect)
 
@@ -153,38 +165,47 @@ def main_menu() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-            elif (event.type == pygame.MOUSEBUTTONUP and
-                  play_button.check_position(mouse_pos) is True):
-                settings()
-                play()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if play_button.check_position(mouse_pos) is True:
+                    settings_from_play()
+                elif tutorial_button.check_position(mouse_pos) is True:
+                    tutorial()
+                elif settings_button.check_position(mouse_pos) is True:
+                    settings()
 
         pygame.display.update()
 
 
-def settings() -> None:
-    pygame.display.set_caption("Settings")
+def settings_from_play() -> None:
     screen.fill(BLACK)
 
-    back_button = Button(pos=(0, 0), text_input="Back",
+    back_button = Button(pos=(150, 100), text_input="Back",
                          font=get_font(50, "SemiBold"),
                          base_colour=TEXT_BASE_COLOUR,
                          hover_colour=TEXT_HOVER_COLOUR,
                          bg_base_colour=BUTTON_BASE_COLOUR,
                          bg_hover_colour=BUTTON_HOVER_COLOUR,
-                         screen_width=w,
+                         width=250,
+                         height=100,
                          transparent=True)
 
-    play_button = Button(pos=(w * HALF, h * HALF), text_input="PLAY",
-                         font=get_font(75, "Bold"),
+    play_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE),
+                         text_input="PLAY",
+                         font=get_font(BUTTON_TEXT_SIZE, "Medium"),
                          base_colour=TEXT_BASE_COLOUR,
                          hover_colour=TEXT_HOVER_COLOUR,
                          bg_base_colour=BUTTON_BASE_COLOUR,
                          bg_hover_colour=BUTTON_HOVER_COLOUR,
-                         screen_width=w,
+                         width=MENU_BUTTON_WIDTH,
+                         height=MENU_BUTTON_HEIGHT,
                          transparent=True)
     pygame.display.update()
 
     while True:
+        pygame.display.set_caption("Settings from play")
+
+        screen.blit(blurred_bg_scaled, blurred_bg_rect)
+
         mouse_pos = pygame.mouse.get_pos()
 
         back_button.change_colour(mouse_pos)
@@ -196,6 +217,57 @@ def settings() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.MOUSEBUTTONUP:
+                if back_button.check_position(mouse_pos) is True:
+                    return
+                elif play_button.check_position(mouse_pos) is True:
+                    play()
+                    return
+
+        pygame.display.update()
+
+
+def settings() -> None:
+    screen.fill(BLACK)
+    screen.blit(blurred_bg_scaled, blurred_bg_rect)
+
+    back_button = Button(pos=(100, 100), text_input="Back",
+                         font=get_font(50, "SemiBold"),
+                         base_colour=TEXT_BASE_COLOUR,
+                         hover_colour=TEXT_HOVER_COLOUR,
+                         bg_base_colour=BUTTON_BASE_COLOUR,
+                         bg_hover_colour=BUTTON_HOVER_COLOUR,
+                         width=250,
+                         height=100,
+                         transparent=True)
+
+    done_button = Button(pos=(w * HALF, h * HALF), text_input="Done",
+                         font=get_font(75, "Bold"),
+                         base_colour=TEXT_BASE_COLOUR,
+                         hover_colour=TEXT_HOVER_COLOUR,
+                         bg_base_colour=BUTTON_BASE_COLOUR,
+                         bg_hover_colour=BUTTON_HOVER_COLOUR,
+                         width=MENU_BUTTON_WIDTH,
+                         height=MENU_BUTTON_HEIGHT,
+                         transparent=True)
+
+    pygame.display.update()
+
+    while True:
+        pygame.display.set_caption("Settings")
+
+        mouse_pos = pygame.mouse.get_pos()
+
+        back_button.change_colour(mouse_pos)
+        back_button.update(screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONUP:
+                if (back_button.check_position(mouse_pos) is True or
+                        done_button.check_position(mouse_pos) is True):
+                    return
 
         pygame.display.update()
 
@@ -205,6 +277,13 @@ def tutorial():
     The tutorial screen. Tells the user how each of the pieces move, how
     promotion works, as well as the rules of chess.
     """
+    screen.fill(BLACK)
+    screen.blit(blurred_bg_scaled, blurred_bg_rect)
+
+    while True:
+        pygame.display.set_caption("Tutorial")
+
+        mouse_pos = pygame.mouse.get_pos()
     pass
 
 
@@ -212,10 +291,15 @@ def play() -> None:
     """
     The current game board.
     """
-    while True:
-        mouse_pos = pygame.mouse.get_pos()
-        screen.fill(BLACK)
+    board.new_game()
+    screen.fill(BLACK)
 
+    while True:
+        pygame.display.set_caption("Play")
+
+        mouse_pos = pygame.mouse.get_pos()
+
+        # TODO this is temporary
         play_text = get_font(50).render("This is the PLAY screen.",
                                         True, "white")
         screen.blit(play_text, play_text.get_rect(center=(w//2, h//2)))
