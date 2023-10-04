@@ -4,6 +4,8 @@ import ctypes
 from button import Button
 from typing import Literal
 import board
+import pygame_widgets
+from pygame_widgets.slider import Slider
 
 # Constants
 # Colours are stored as tuple[r, g, b] integer values.
@@ -18,6 +20,7 @@ TEXT_HOVER_COLOUR: tuple[int, int, int] = (0, 0, 0)
 
 BUTTON_BASE_COLOUR: tuple[int, int, int] = (0, 0, 0)
 BUTTON_HOVER_COLOUR: tuple[int, int, int] = (255, 255, 255)
+DARK_GRAY = (16, 16, 16)
 
 BUTTON_GAP: int = 40
 HALF: float = 0.5
@@ -25,6 +28,7 @@ DOUBLE: int = 2
 HEIGHT: int = 160
 MENU_BUTTON_WIDTH: int = 530
 MENU_BUTTON_HEIGHT: int = 150
+
 
 board = board.Board()
 
@@ -53,6 +57,8 @@ def get_font(size: int,
     :param size: Size of the font.
     :param style: Thickness of the font. Must be one of 'Bold', 'Medium',
      'Regular' or 'SemiBold'. Defaults to 'Regular'.
+
+    Returns a pygame Font instance with the desired style and size.
     """
 
     style = style.capitalize()
@@ -214,6 +220,18 @@ def settings(from_play: bool) -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
+    MENU_TEXT_SIZE: int = 50
+    SLIDER_LENGTH: int = 400
+    SLIDER_WIDTH: int = 20
+    SLIDER_MIN, SLIDER_MAX = 500, 2800
+    STEP: int = 100
+    INITIAL: int = 800
+
+    slider = Slider(screen, int(w * HALF - SLIDER_LENGTH * HALF),
+                    int(h * HALF + BUTTON_GAP * DOUBLE), SLIDER_LENGTH,
+                    SLIDER_WIDTH, min=SLIDER_MIN, max=SLIDER_MAX, step=STEP,
+                    initial=INITIAL, handleColour=DARK_GRAY)
+
     while True:
         screen.blit(blurred_bg_scaled, blurred_bg_rect)
 
@@ -229,7 +247,20 @@ def settings(from_play: bool) -> None:
             done_button.change_colour(mouse_pos)
             done_button.update(screen)
 
+        # Engine Difficulty Setting
+        difficulty_text = get_font(MENU_TEXT_SIZE).render("Engine Difficulty",
+                                                          True, 'white')
+        difficulty_text_rect = difficulty_text.get_rect(center=(w * HALF,
+                                                                h * HALF +
+                                                                BUTTON_GAP))
+        slider_value_text = get_font(MENU_TEXT_SIZE).render(str(
+            slider.getValue()), True, 'white')
+        slider_text_rect = slider_value_text.get_rect(center=(w * HALF,
+                                                              h * HALF + 4
+                                                              * BUTTON_GAP))
         for event in pygame.event.get():
+            pygame_widgets.update(event)
+
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONUP:
@@ -243,7 +274,12 @@ def settings(from_play: bool) -> None:
                         is True:
                     return
 
-        pygame.display.update()
+            screen.blit(slider_value_text, slider_text_rect)
+            screen.blit(difficulty_text, difficulty_text_rect)
+
+            # Has to be indented so that the slider draws first
+            # (otherwise causes flickering)
+            pygame.display.update()
 
 
 def tutorial():
@@ -261,6 +297,8 @@ def tutorial():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+
+        pygame.display.update()
 
 
 def play() -> None:
