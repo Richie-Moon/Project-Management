@@ -79,3 +79,23 @@ class Button:
             self.text = self.font.render(self.text_input, True,
                                          self.base_colour)
             self.bg.fill(self.bg_base_colour)
+
+
+class ImageButton(Button):
+    def __init__(self, pos: tuple[float, float], text_input: str,
+                 font: pygame.font.Font, base_colour: tuple[int, int, int],
+                 hover_colour: tuple[int, int, int],
+                 bg_base_colour: tuple[int, int, int],
+                 bg_hover_colour: tuple[int, int, int], width: int,
+                 height: int, transparent: bool, image: pygame.Surface):
+        super().__init__(pos, text_input, font, base_colour, hover_colour,
+                         bg_base_colour, bg_hover_colour, width, height,
+                         transparent)
+        self.image = image
+        self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+
+    def update(self, screen: pygame.Surface) -> None:
+        super().update(screen)
+        screen.blit(self.image, self.rect)
+        # screen.blit(self.text, self.text_rect)
+

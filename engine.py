@@ -19,7 +19,8 @@ class Engine:
         # Initialise the engine.
         self.write('uci\n')
 
-        self.DEFAULT_ELO: int = 1000  # TODO this is a temp value.
+        self.DEFAULT_ELO: int = 800  # TODO this is a temp value.
+        self.elo = self.DEFAULT_ELO
         self.moves = []
 
     def write(self, message: str) -> None:
@@ -51,6 +52,7 @@ class Engine:
         500 and 2850
         """
         self.write(f"setoption UCI_Elo value {elo}")
+        self.elo = elo
 
     def get_position(self) -> str:
         self.write("d\n")

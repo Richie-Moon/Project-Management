@@ -1,7 +1,7 @@
 import pygame
 import sys
 import ctypes
-from button import Button
+from button import Button, ImageButton
 from typing import Literal
 import board
 import pygame_widgets
@@ -10,6 +10,8 @@ from pygame_widgets.slider import Slider
 # Constants
 # Colours are stored as tuple[r, g, b] integer values.
 BLACK: tuple[int, int, int] = (0, 0, 0)
+WHITE: tuple[int, int, int] = (255, 255, 255)
+
 
 TITLE_SIZE: int = 150
 TITLE_POSITION: int = 8
@@ -220,25 +222,53 @@ def settings(from_play: bool) -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
+    side_white_image = pygame.image.load("assets/pieces/white/king.png")
+    side_white = ImageButton(pos=(w * HALF - side_white_image.get_height()
+                                  * HALF, h * HALF),
+                             text_input="",
+                             font=get_font(20), base_colour=BLACK,
+                             hover_colour=WHITE, bg_base_colour=BLACK,
+                             bg_hover_colour=WHITE,
+                             width=side_white_image.get_width(),
+                             height=side_white_image.get_height(),
+                             transparent=True, image=side_white_image)
+
+    side_black_image = pygame.image.load("assets/pieces/black/king.png")
+    side_black = ImageButton(pos=(w * HALF, h * HALF), text_input="",
+                             font=get_font(20), base_colour=BLACK,
+                             hover_colour=WHITE, bg_base_colour=BLACK,
+                             bg_hover_colour=WHITE,
+                             width=side_black_image.get_width(),
+                             height=side_black_image.get_height(),
+                             transparent=True, image=side_black_image)
+
     MENU_TEXT_SIZE: int = 50
+
+    # Slider Settings
     SLIDER_LENGTH: int = 400
     SLIDER_WIDTH: int = 20
     SLIDER_MIN, SLIDER_MAX = 500, 2800
     STEP: int = 100
-    INITIAL: int = 800
+    SLIDER_POS = 3
 
     slider = Slider(screen, int(w * HALF - SLIDER_LENGTH * HALF),
-                    int(h * HALF + BUTTON_GAP * DOUBLE), SLIDER_LENGTH,
+                    int(h * HALF + BUTTON_GAP * SLIDER_POS), SLIDER_LENGTH,
                     SLIDER_WIDTH, min=SLIDER_MIN, max=SLIDER_MAX, step=STEP,
-                    initial=INITIAL, handleColour=DARK_GRAY)
+                    initial=board.engine.elo, handleColour=DARK_GRAY)
 
     while True:
         screen.blit(blurred_bg_scaled, blurred_bg_rect)
 
         mouse_pos = pygame.mouse.get_pos()
 
-        back_button.change_colour(mouse_pos)
         back_button.update(screen)
+        back_button.change_colour(mouse_pos)
+
+        side_black.update(screen)
+        side_black.change_colour(mouse_pos)
+
+        side_white.update(screen)
+        side_white.change_colour(mouse_pos)
 
         if from_play:
             play_button.change_colour(mouse_pos)
@@ -251,27 +281,48 @@ def settings(from_play: bool) -> None:
         difficulty_text = get_font(MENU_TEXT_SIZE).render("Engine Difficulty",
                                                           True, 'white')
         difficulty_text_rect = difficulty_text.get_rect(center=(w * HALF,
-                                                                h * HALF +
-                                                                BUTTON_GAP))
+                                                                slider.get('y')
+                                                                - BUTTON_GAP))
         slider_value_text = get_font(MENU_TEXT_SIZE).render(str(
             slider.getValue()), True, 'white')
         slider_text_rect = slider_value_text.get_rect(center=(w * HALF,
-                                                              h * HALF + 4
-                                                              * BUTTON_GAP))
+                                                              slider.get('y') +
+                                                              BUTTON_GAP *
+                                                              DOUBLE))
         for event in pygame.event.get():
             pygame_widgets.update(event)
 
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONUP:
+                # Back buttons pressed
                 if back_button.check_position(mouse_pos) is True:
+                    slider.hide()
                     return
+
+                # White side selected
+                elif side_black.check_position(mouse_pos) is True:
+                    # TODO give this info to board
+                    pass
+
+                # Black side selected
+                elif side_black.check_position(mouse_pos) is True:
+                    # TODO give this info to board
+                    pass
+
+                # Play button pressed
                 elif from_play and play_button.check_position(mouse_pos) \
                         is True:
+                    board.engine.change_elo(slider.getValue())
+                    slider.hide()
                     play()
                     return
+
+                # Done button pressed
                 elif not from_play and done_button.check_position(mouse_pos) \
                         is True:
+                    board.engine.change_elo(slider.getValue())
+                    slider.hide()
                     return
 
             screen.blit(slider_value_text, slider_text_rect)
