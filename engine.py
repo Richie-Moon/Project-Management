@@ -19,7 +19,7 @@ class Engine:
         # Initialise the engine.
         self.write('uci\n')
 
-        self.DEFAULT_ELO: int = 800  # TODO this is a temp value.
+        self.DEFAULT_ELO: int = 800
         self.elo = self.DEFAULT_ELO
         self.moves = []
 

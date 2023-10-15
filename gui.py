@@ -12,7 +12,6 @@ from pygame_widgets.slider import Slider
 BLACK: tuple[int, int, int] = (0, 0, 0)
 WHITE: tuple[int, int, int] = (255, 255, 255)
 
-
 TITLE_SIZE: int = 150
 TITLE_POSITION: int = 8
 
@@ -30,7 +29,7 @@ DOUBLE: int = 2
 HEIGHT: int = 160
 MENU_BUTTON_WIDTH: int = 530
 MENU_BUTTON_HEIGHT: int = 150
-
+MENU_TEXT_SIZE: int = 50
 
 board = board.Board()
 
@@ -222,27 +221,37 @@ def settings(from_play: bool) -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
-    side_white_image = pygame.image.load("assets/pieces/white/king.png")
-    side_white = ImageButton(pos=(w * HALF - side_white_image.get_height()
-                                  * HALF, h * HALF),
+    white_image = pygame.image.load("assets/pieces/white/king.png")
+    side_white_image, side_white_rect = scale_image(white_image, (
+        white_image.get_height() * DOUBLE, white_image.get_width() * DOUBLE))
+
+    side_white = ImageButton(pos=(w * HALF - side_white_image.get_width()
+                                  * HALF, h * HALF - BUTTON_GAP),
                              text_input="",
-                             font=get_font(20), base_colour=BLACK,
+                             font=get_font(BUTTON_TEXT_SIZE),
+                             base_colour=BLACK,
                              hover_colour=WHITE, bg_base_colour=BLACK,
                              bg_hover_colour=WHITE,
                              width=side_white_image.get_width(),
                              height=side_white_image.get_height(),
                              transparent=True, image=side_white_image)
 
-    side_black_image = pygame.image.load("assets/pieces/black/king.png")
-    side_black = ImageButton(pos=(w * HALF, h * HALF), text_input="",
-                             font=get_font(20), base_colour=BLACK,
+    black_image = pygame.image.load("assets/pieces/black/king.png")
+    side_black_image, side_black_rect = scale_image(black_image, (
+        black_image.get_height() * DOUBLE, black_image.get_width() * DOUBLE))
+
+    side_black = ImageButton(pos=(w * HALF + side_black_rect.height * HALF,
+                                  h * HALF - BUTTON_GAP),
+                             text_input="",
+                             font=get_font(BUTTON_TEXT_SIZE),
+                             base_colour=BLACK,
                              hover_colour=WHITE, bg_base_colour=BLACK,
                              bg_hover_colour=WHITE,
-                             width=side_black_image.get_width(),
-                             height=side_black_image.get_height(),
+                             width=side_black_rect.width,
+                             height=side_black_rect.height,
                              transparent=True, image=side_black_image)
 
-    MENU_TEXT_SIZE: int = 50
+    side_white.enable()
 
     # Slider Settings
     SLIDER_LENGTH: int = 400
@@ -277,6 +286,14 @@ def settings(from_play: bool) -> None:
             done_button.change_colour(mouse_pos)
             done_button.update(screen)
 
+        # Side selection setting
+        side_select_text = get_font(MENU_TEXT_SIZE).render("Side Select",
+                                                           True, 'white')
+        side_select_rect = side_select_text.get_rect(center=(w * HALF,
+                                                             side_white.y_pos
+                                                             - BUTTON_GAP *
+                                                             DOUBLE))
+
         # Engine Difficulty Setting
         difficulty_text = get_font(MENU_TEXT_SIZE).render("Engine Difficulty",
                                                           True, 'white')
@@ -301,14 +318,17 @@ def settings(from_play: bool) -> None:
                     return
 
                 # White side selected
-                elif side_black.check_position(mouse_pos) is True:
-                    # TODO give this info to board
-                    pass
+                elif side_white.check_position(mouse_pos) is True:
+                    side_white.enable()
+                    side_black.disable()
+                    board.user_side = 0
 
                 # Black side selected
                 elif side_black.check_position(mouse_pos) is True:
-                    # TODO give this info to board
-                    pass
+                    print(side_black.base_colour_record)
+                    side_black.enable()
+                    side_white.disable()
+                    board.user_side = 1
 
                 # Play button pressed
                 elif from_play and play_button.check_position(mouse_pos) \
@@ -324,6 +344,8 @@ def settings(from_play: bool) -> None:
                     board.engine.change_elo(slider.getValue())
                     slider.hide()
                     return
+
+            screen.blit(side_select_text, side_select_rect)
 
             screen.blit(slider_value_text, slider_text_rect)
             screen.blit(difficulty_text, difficulty_text_rect)

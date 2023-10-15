@@ -94,8 +94,17 @@ class ImageButton(Button):
         self.image = image
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
 
+        self.base_colour_record = self.bg_base_colour
+
     def update(self, screen: pygame.Surface) -> None:
         super().update(screen)
         screen.blit(self.image, self.rect)
         # screen.blit(self.text, self.text_rect)
+
+    def enable(self):
+        green = (0, 150, 0)
+        self.bg_base_colour = green
+
+    def disable(self):
+        self.bg_base_colour = self.base_colour_record
 

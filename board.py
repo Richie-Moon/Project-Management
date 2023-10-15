@@ -19,6 +19,9 @@ class Board:
         self.MAX_FILE = 6
         self.MAX_RANK = 6
 
+        # 0 = white, 1 = black
+        self.user_side: int = 0  # Could try other ways if int not good
+
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
 
     def new_game(self) -> None:
@@ -30,7 +33,7 @@ class Board:
         self.fen_to_board(self.START_BOARD)
 
     def fen_to_board(self, fen: str):
-        # Splits the extra info off from the end of the fen
+        # Split the extra info off from the end of the fen
         split_fen = fen.split(' ')
         # Splits each rank into its own item in the list.
         split_fen = split_fen[0].split('/')
