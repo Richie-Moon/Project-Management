@@ -330,6 +330,8 @@ def settings(from_play: bool) -> None:
                     side_white.disable()
                     board.user_side = 1
 
+                    print("User side: ", board.user_side)
+
                 # Play button pressed
                 elif from_play and play_button.check_position(mouse_pos) \
                         is True:
@@ -381,15 +383,16 @@ def play() -> None:
     board.new_game()
     screen.fill(BLACK)
 
+    board_rect = pygame.Rect(0, 0, h, h)
+
     while True:
         pygame.display.set_caption("Play")
 
         mouse_pos = pygame.mouse.get_pos()
 
-        # TODO this is temporary
-        play_text = get_font(50).render("This is the PLAY screen.",
-                                        True, "white")
-        screen.blit(play_text, play_text.get_rect(center=(w // 2, h // 2)))
+        board_rect.center = (w//2, h//2)
+
+        pygame.draw.rect(screen, (196, 164, 132), board_rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
