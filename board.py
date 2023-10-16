@@ -37,7 +37,9 @@ class Board:
         split_fen = fen.split(' ')
         # Splits each rank into its own item in the list.
         split_fen = split_fen[0].split('/')
-        split_fen.reverse()
+
+        if self.user_side == 0:
+            split_fen.reverse()
 
         for i in range(self.MAX_FILE):
             rank_list = []
@@ -52,7 +54,7 @@ class Board:
 
             self.board.append(rank_list)
 
-    def update_board(self):
+    def move(self):
         pass
 
     def on_square(self, file: int, rank: int) -> Type[piece.Piece] | None:
@@ -61,6 +63,15 @@ class Board:
         piece. Returns the piece instance, if there is a piece on the square.
         Otherwise, returns None. Uses 0 indexing.
         """
+        if type(file) != int or type(rank) != int:
+            raise TypeError("Please provide integers for paremeters `file` "
+                            "and `rank`. ")
+
+        if file < 0 or file > self.MAX_FILE - 1 or \
+                rank < 0 or rank > self.MAX_RANK - 1:
+            raise ValueError("Parameters `file` and `rank` must be between 0 "
+                             "and 5 (inclusive). ")
+
         return self.board[rank][file]
 
     def coords_to_square(self, file: int, rank: int) -> str:

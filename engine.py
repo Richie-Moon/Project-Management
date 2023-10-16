@@ -5,6 +5,7 @@ from typing import Generator, Any
 import time
 
 # https://github.com/fairy-stockfish/FairyFishGUI/blob/main/fairyfishgui.py
+# Note: Engine knows which side to calculate for using FEN.
 
 
 class Engine:
@@ -49,7 +50,7 @@ class Engine:
         """
         Changes the elo strength of the engine.
         :param elo: The elo that the engine should play at. Must be between
-        500 and 2850
+         500 and 2850
         """
         self.write(f"setoption UCI_Elo value {elo}")
         self.elo = elo
@@ -68,7 +69,7 @@ class Engine:
         """
         :param fen: The current board in FEN notation.
         :param move: The move to make on the board, given in LAN
-        (Long Algebraic Notation).
+         (Long Algebraic Notation).
         """
         self.write(f"position {fen} moves {move}")
 
