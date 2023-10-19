@@ -2,20 +2,32 @@ import pygame
 
 LIGHT = (207, 177, 129)
 DARK = (129, 92, 60)
-DEFAULT_POS = (0, 0)
+DEFAULT_POS = (200, 200)
 
 
 class Square:
-    def __init__(self, pos: tuple[int, int], light: bool,
-                 w: int):
+    def __init__(self, pos: tuple[int, int], light: bool, w: int, file: int,
+                 rank: int):
+        """
+
+        :param pos: x and y co-ordinates for the top-left corner of square.
+        :param light:
+        :param w:
+        :param file: The file co-ordinate of the square. Must be 0-5 inclusive.
+        :param rank: The rank co-ordinate of the square. Must be 0-5 inclusive.
+        """
         self.x_pos = pos[0]
         self.y_pos = pos[1]
-        self.light = light
+        self.light: bool = light
+        self.w = w
+
+        self.dot: bool = False
+
+        self.file = file
+        self.rank = rank
 
         # Create correct sized rect at 0,0
-        self.rect = pygame.Rect(DEFAULT_POS, (w, w))
-        # Move self.rect to position.
-        self.rect.center = pos
+        self.rect = pygame.Rect(self.x_pos, self.y_pos, w, w)
 
     def draw(self, screen: pygame.Surface):
         if self.light:
@@ -23,6 +35,12 @@ class Square:
         if not self.light:
             pygame.draw.rect(screen, DARK, self.rect)
 
-
     def update(self, board: list[list]):
         pass
+
+    # For testing
+    # def show_coords(self, screen: pygame.Surface, text: pygame.font.Font):
+    #     text = text.render(f"{self.file}, {self.rank}", True, 'black')
+    #     rect = text.get_rect(center=(self.x_pos + self.w // 2,
+    #                                  self.y_pos + self.w // 2))
+    #     screen.blit(text, rect)

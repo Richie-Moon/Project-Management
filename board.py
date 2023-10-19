@@ -67,8 +67,8 @@ class Board:
             raise TypeError("Please provide integers for paremeters `file` "
                             "and `rank`. ")
 
-        if file < 0 or file > self.MAX_FILE - 1 or \
-                rank < 0 or rank > self.MAX_RANK - 1:
+        if (file < 0 or file > self.MAX_FILE - 1) or \
+                (rank < 0 or rank > self.MAX_RANK - 1):
             raise ValueError("Parameters `file` and `rank` must be between 0 "
                              "and 5 (inclusive). ")
 

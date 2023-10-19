@@ -32,6 +32,9 @@ MENU_BUTTON_WIDTH: int = 530
 MENU_BUTTON_HEIGHT: int = 150
 MENU_TEXT_SIZE: int = 50
 
+NUM_FILES = 6
+NUM_RANKS = 6
+
 board = board.Board()
 
 pygame.init()
@@ -82,6 +85,17 @@ def scale_image(image: pygame.Surface, size: tuple[int, int]) \
     scaled_image = pygame.transform.smoothscale(image, new_size)
     image_rect = scaled_image.get_rect(center=(size[0] // 2, size[1] // 2))
     return scaled_image, image_rect
+
+
+def is_even(num: int) -> bool:
+    """
+    Returns True if num is even, False if it's odd.
+    :param num: Number to check.
+    :return:
+    """
+    if num % 2 == 0:
+        return True
+    return False
 
 
 def display_title() -> None:
@@ -383,10 +397,30 @@ def play() -> None:
 
     pygame.display.set_caption("Play")
 
-    board_rect = pygame.Rect(0, 0, h, h)
+    # The rect containing the full board. Resizes to fit window.
+    TOPLEFT = (0, 0)
+    board_rect = pygame.Rect(TOPLEFT, (h, h))
+    square_width: int = board_rect.width // NUM_FILES
+
+    # Draw board
+    squares: list[Square] = []
+    for i in range(NUM_FILES):
+        for j in range(NUM_RANKS):
+            # If both square coords are even or odd, they are light.
+            # Otherwise, it is dark.
+            if ((is_even(i) and is_even(j)) or
+                    (not is_even(i) and not is_even(j))):
+                light = True
+            else:
+                light = False
+
+            sq = Square((j * square_width, i * square_width), light,
+                        square_width, j, NUM_RANKS - 1 - i)
+
+            sq.draw(screen)
+            squares.append(sq)
 
     while True:
-
         mouse_pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
