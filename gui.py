@@ -92,7 +92,7 @@ def scale_image(image: pygame.Surface, size: tuple[int, int]) \
 
 def is_even(num: int) -> bool:
     """
-    Returns True if num is even, False if it's odd.
+    Returns True if `num` is even, False if it's odd.
     :param num: Number to check.
     :return:
     """
@@ -239,9 +239,9 @@ def settings(from_play: bool) -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
-    white_image = pygame.image.load("assets/pieces/white/king.png")
+    white_image = pygame.image.load("assets/pieces/white/K.svg")
     side_white_image, side_white_rect = scale_image(white_image, (
-        white_image.get_height() * DOUBLE, white_image.get_width() * DOUBLE))
+        white_image.get_height() // 8, white_image.get_width() // 8))
 
     side_white = ImageButton(pos=(w * HALF - side_white_image.get_width()
                                   * HALF, h * HALF - BUTTON_GAP),
@@ -254,9 +254,9 @@ def settings(from_play: bool) -> None:
                              height=side_white_image.get_height(),
                              transparent=True, image=side_white_image)
 
-    black_image = pygame.image.load("assets/pieces/black/king.png")
+    black_image = pygame.image.load("assets/pieces/black/k.svg")
     side_black_image, side_black_rect = scale_image(black_image, (
-        black_image.get_height() * DOUBLE, black_image.get_width() * DOUBLE))
+        black_image.get_height() // 8, black_image.get_width() // 8))
 
     side_black = ImageButton(pos=(w * HALF + side_black_rect.height * HALF,
                                   h * HALF - BUTTON_GAP),
@@ -398,7 +398,6 @@ def play() -> None:
     """
     The current game board.
     """
-    board.new_game()
     screen.fill(BLACK)
 
     pygame.display.set_caption("Play")
@@ -407,6 +406,7 @@ def play() -> None:
     TOPLEFT = (0, 0)
     board_rect = pygame.Rect(TOPLEFT, (h, h))
     square_width: int = board_rect.width // NUM_FILES
+    board.new_game(square_width)
 
     # Draw board
     squares: list[Square] = []
@@ -428,17 +428,40 @@ def play() -> None:
 
     while True:
         screen.fill(BLACK)
+
+        # Draw the board
         for sq in squares:
             sq.draw(screen)
 
-        img = scale_image(pygame.image.load("assets/pieces/white/king.png"),
-                          (square_width, square_width))
-        squares[0].place_image(screen, img[0])
+        # Place images pieces onto board
+        for square in squares:
+            piece = board.board[square.rank][square.file]
+            if piece is not None:
+                square.place_image(screen, piece.image)
+                square.has_piece = True
 
-        mouse_pos = pygame.mouse.get_pos()
+        selected_piece = None
 
+        # Pygame event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                mouse_pos = pygame.mouse.get_pos()
+
+                for square in squares:
+                    if square.has_piece:
+                        clicked = square.check_position(mouse_pos)
+                        if clicked:
+                            piece = board.board[square.rank][square.file]
+                            selected_piece = piece
+                            valid_moves = piece.valid_moves()
+                            for location in valid_moves:
+                                pass
+
+                    elif square.dot:
+                        # move selected piece to dot.
+                        pass
 
         pygame.display.update()

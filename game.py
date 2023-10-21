@@ -33,6 +33,8 @@ class Square:
         # Create rect for square
         self.rect = pygame.Rect(self.x_pos, self.y_pos, w, w)
 
+        self.has_piece: bool = False
+
     def draw(self, screen: pygame.Surface):
         if self.light:
             pygame.draw.rect(screen, LIGHT, self.rect)
@@ -46,6 +48,12 @@ class Square:
 
     def update(self, board: list[list]):
         pass
+
+    def check_position(self, position: tuple[int, int]) -> bool:
+        if (position[0] in range(self.rect.left, self.rect.right) and
+                position[1] in range(self.rect.top, self.rect.bottom)):
+            return True
+        return False
 
     def place_image(self, screen: pygame.Surface, image: pygame.Surface):
         screen.blit(image, self.rect)

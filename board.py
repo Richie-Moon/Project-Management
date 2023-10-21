@@ -2,7 +2,20 @@ import pyffish
 import piece
 from typing import Type
 import engine
+import pygame
 
+
+def reverse_items(items: list[str]) -> list[str]:
+    """
+    Returns the given list with every item reversed.
+    :param items: The items to reverse, given in a list.
+    :return:
+    """
+    reversed_items = []
+    for item in items:
+        reversed_items.append(item[::-1])
+
+    return reversed_items
 
 class Board:
     def __init__(self) -> None:
@@ -11,8 +24,8 @@ class Board:
                                 'k': piece.King}
         self.NUM_TO_FILE = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f'}
 
-        self.START_BOARD: str = pyffish.start_fen('losalamos')
-        self.board_fen = self.START_BOARD
+        self.START_FEN: str = pyffish.start_fen('losalamos')
+        self.board_fen = self.START_FEN
         self.board: list[list[Type[piece.Piece] | None]] = []
         self.moves: list[str] = []
 
@@ -24,15 +37,15 @@ class Board:
 
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
 
-    def new_game(self) -> None:
+    def new_game(self, w: int) -> None:
         # Reset instance variables.
         self.board = []
         self.moves = []
 
         self.engine.new_game()
-        self.fen_to_board(self.START_BOARD)
+        self.fen_to_board(self.START_FEN, w)
 
-    def fen_to_board(self, fen: str):
+    def fen_to_board(self, fen: str, w: int):
         # Split the extra info off from the end of the fen
         split_fen = fen.split(' ')
         # Splits each rank into its own item in the list.
@@ -40,6 +53,8 @@ class Board:
 
         if self.user_side == 0:
             split_fen.reverse()
+        else:
+            split_fen = reverse_items(split_fen)
 
         for i in range(self.MAX_FILE):
             rank_list = []
@@ -49,8 +64,14 @@ class Board:
                     empty_squares = int(item)
                     rank_list.extend([None] * empty_squares)
                 except ValueError:
+                    if item.isupper():
+                        path = "assets/pieces/white/"
+                    else:
+                        path = "assets/pieces/black/"
+                    img = pygame.image.load(f"{path}{item}.svg")
                     rank_list.append(self.LETTER_TO_PIECE
-                                     [item.lower()](item, len(rank_list), i))
+                                     [item.lower()]
+                                     (item, len(rank_list), i, img, w))
 
             self.board.append(rank_list)
 
@@ -64,7 +85,7 @@ class Board:
         Otherwise, returns None. Uses 0 indexing.
         """
         if type(file) != int or type(rank) != int:
-            raise TypeError("Please provide integers for paremeters `file` "
+            raise TypeError("Please provide integers for parameters `file` "
                             "and `rank`. ")
 
         if (file < 0 or file > self.MAX_FILE - 1) or \

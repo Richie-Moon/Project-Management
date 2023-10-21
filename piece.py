@@ -1,5 +1,9 @@
+import pygame
+
+
 class Piece:
-    def __init__(self, letter: str, file: int, rank: int):
+    def __init__(self, letter: str, file: int, rank: int,
+                 image: pygame.Surface, w: float):
         self.letter = letter
         self.file = file  # 0-5
         self.rank = rank  # 0-5
@@ -13,6 +17,8 @@ class Piece:
         self.MAX_RANK = 5
         self.MIN_FILE = 0
         self.MIN_RANK = 0
+
+        self.image = pygame.transform.smoothscale(image, (w, w))
 
         if self.file == self.MIN_FILE:
             self.LEFT = True
@@ -33,8 +39,9 @@ class Piece:
 
 
 class Pawn(Piece):
-    def __init__(self, letter: str, file: int, rank: int):
-        super().__init__(letter, file, rank)
+    def __init__(self, letter: str, file: int, rank: int,
+                 image: pygame.Surface, w: int):
+        super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self, board) -> list:
         moves = []
@@ -71,8 +78,9 @@ class Pawn(Piece):
 
 
 class Knight(Piece):
-    def __init__(self, letter: str, file: int, rank: int):
-        super().__init__(letter, file, rank)
+    def __init__(self, letter: str, file: int, rank: int,
+                 image: pygame.Surface, w: int):
+        super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self) -> list:
         moves = []
@@ -80,8 +88,9 @@ class Knight(Piece):
 
 
 class Rook(Piece):
-    def __init__(self, letter: str, file: int, rank: int):
-        super().__init__(letter, file, rank)
+    def __init__(self, letter: str, file: int, rank: int,
+                 image: pygame.Surface, w: int):
+        super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self) -> list:
         moves = []
@@ -89,8 +98,9 @@ class Rook(Piece):
 
 
 class Queen(Piece):
-    def __init__(self, letter: str, file: int, rank: int):
-        super().__init__(letter, file, rank)
+    def __init__(self, letter: str, file: int, rank: int,
+                 image: pygame.Surface, w: int):
+        super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self) -> list:
         moves = []
@@ -98,11 +108,10 @@ class Queen(Piece):
 
 
 class King(Piece):
-    def __init__(self, letter: str, file: int, rank: int):
-        super().__init__(letter, file, rank)
+    def __init__(self, letter: str, file: int, rank: int,
+                 image: pygame.Surface, w: int):
+        super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self) -> list:
         moves = []
         return moves
-
-
