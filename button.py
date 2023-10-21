@@ -108,3 +108,10 @@ class ImageButton(Button):
     def disable(self):
         self.bg_base_colour = self.base_colour_record
 
+
+class PieceButton:
+    def __init__(self, pos: tuple[float, float],  image: pygame.Surface):
+        self.image = image
+        self.x_pos = pos[0]
+        self.y_pos = pos[1]
+

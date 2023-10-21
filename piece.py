@@ -58,11 +58,13 @@ class Pawn(Piece):
         if not self.LEFT:
             on_left = board.on_square(*left)
             # If there is a piece and the piece is not the same colour.
-            if on_left and on_left.letter.isupper() is not self.letter.isupper():
+            if (on_left and on_left.letter.isupper() is not
+                    self.letter.isupper()):
                 moves.append(left)
         if not self.RIGHT:
             on_right = board.on_square(*right)
-            if on_right and on_right.letter.isupper() is not self.letter.isupper():
+            if (on_right and on_right.letter.isupper() is not
+                    self.letter.isupper()):
                 moves.append(right)
 
         return moves

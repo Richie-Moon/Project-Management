@@ -2,7 +2,10 @@ import pygame
 
 LIGHT = (207, 177, 129)
 DARK = (129, 92, 60)
-DEFAULT_POS = (200, 200)
+GRAY = (211, 211, 211)
+
+HALF = 0.5
+CIRCLE_RADIUS = 5
 
 
 class Square:
@@ -11,8 +14,8 @@ class Square:
         """
 
         :param pos: x and y co-ordinates for the top-left corner of square.
-        :param light:
-        :param w:
+        :param light: Whether the light is light (True) or dark (False)
+        :param w: Width of the square.
         :param file: The file co-ordinate of the square. Must be 0-5 inclusive.
         :param rank: The rank co-ordinate of the square. Must be 0-5 inclusive.
         """
@@ -25,8 +28,9 @@ class Square:
 
         self.file = file
         self.rank = rank
+        self.coords = (file, rank)
 
-        # Create correct sized rect at 0,0
+        # Create rect for square
         self.rect = pygame.Rect(self.x_pos, self.y_pos, w, w)
 
     def draw(self, screen: pygame.Surface):
@@ -35,8 +39,16 @@ class Square:
         if not self.light:
             pygame.draw.rect(screen, DARK, self.rect)
 
+        if self.dot:
+            pygame.draw.circle(screen, GRAY, (self.x_pos + self.w * HALF,
+                                              self.y_pos+self.w * HALF),
+                               self.w // CIRCLE_RADIUS)
+
     def update(self, board: list[list]):
         pass
+
+    def place_image(self, screen: pygame.Surface, image: pygame.Surface):
+        screen.blit(image, self.rect)
 
     # For testing
     # def show_coords(self, screen: pygame.Surface, text: pygame.font.Font):

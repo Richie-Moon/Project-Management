@@ -35,6 +35,9 @@ MENU_TEXT_SIZE: int = 50
 NUM_FILES = 6
 NUM_RANKS = 6
 
+# Piece Images
+
+
 board = board.Board()
 
 pygame.init()
@@ -266,7 +269,10 @@ def settings(from_play: bool) -> None:
                              height=side_black_rect.height,
                              transparent=True, image=side_black_image)
 
-    side_white.enable()
+    if board.user_side == 0:
+        side_white.enable()
+    elif board.user_side == 1:
+        side_black.enable()
 
     # Slider Settings
     SLIDER_LENGTH: int = 400
@@ -421,6 +427,14 @@ def play() -> None:
             squares.append(sq)
 
     while True:
+        screen.fill(BLACK)
+        for sq in squares:
+            sq.draw(screen)
+
+        img = scale_image(pygame.image.load("assets/pieces/white/king.png"),
+                          (square_width, square_width))
+        squares[0].place_image(screen, img[0])
+
         mouse_pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
