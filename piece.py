@@ -46,14 +46,9 @@ class Pawn(Piece):
     def valid_moves(self, board) -> list:
         moves = []
 
-        if self.letter.isupper():  # White
-            next_square = (self.file, self.rank + 1)
-            left = (self.file - 1, self.rank + 1)
-            right = (self.file + 1, self.rank + 1)
-        else:  # Black
-            next_square = (self.file, self.rank - 1)
-            left = (self.file - 1, self.rank - 1)
-            right = (self.file + 1, self.rank - 1)
+        next_square = (self.file, self.rank + 1)
+        left = (self.file - 1, self.rank + 1)
+        right = (self.file + 1, self.rank + 1)
 
         on_next_square = board.on_square(*next_square)
 

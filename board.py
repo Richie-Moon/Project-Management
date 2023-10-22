@@ -17,6 +17,7 @@ def reverse_items(items: list[str]) -> list[str]:
 
     return reversed_items
 
+
 class Board:
     def __init__(self) -> None:
         self.LETTER_TO_PIECE = {'p': piece.Pawn, 'n': piece.Knight,
@@ -75,8 +76,16 @@ class Board:
 
             self.board.append(rank_list)
 
-    def move(self):
-        pass
+    def move(self, start: tuple[int, int], end: tuple[int, int]) -> None:
+        # Could return something if needed (like piece, or captured piece)
+
+        print(self.board)
+        s_file, s_rank = start
+        e_file, e_rank = end
+
+        piece = self.board[s_file][s_rank]
+
+        self.board[s_file][s_rank], self.board[e_file][e_rank] = None, piece
 
     def on_square(self, file: int, rank: int) -> Type[piece.Piece] | None:
         """

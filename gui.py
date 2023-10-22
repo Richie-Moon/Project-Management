@@ -7,6 +7,7 @@ import board
 import pygame_widgets
 from pygame_widgets.slider import Slider
 from game import Square
+import numpy as np
 
 # Constants
 # Colours are stored as tuple[r, g, b] integer values.
@@ -34,8 +35,7 @@ MENU_TEXT_SIZE: int = 50
 
 NUM_FILES = 6
 NUM_RANKS = 6
-
-# Piece Images
+NUM_SQUARES = 36
 
 
 board = board.Board()
@@ -99,6 +99,26 @@ def is_even(num: int) -> bool:
     if num % 2 == 0:
         return True
     return False
+
+
+def coords_to_index(coords: tuple[int, int]) -> int:
+    """
+    Creates a 6x6 ndarray, and return the index of the coords supplied.
+    :param coords: The co-ordinates of the needed index.
+    :return: Integer Index corresponding to the co-ordinates given.
+    """
+    INVERSE = 5
+    array = np.arange(NUM_SQUARES).reshape(NUM_FILES, NUM_RANKS)
+
+    # 5 - y co-ord is required due to the ndarray going top to bottom, but the
+    # coords being given in bottom to top.
+    formatted = (coords[0], INVERSE - coords[1])
+
+    # the [::-1] just reverses the list to the form (y,x) instead of (x,y).
+    # Is needed due to the way the ndarray is formatted.
+    formatted = formatted[::-1]
+
+    return array[formatted]
 
 
 def display_title() -> None:
@@ -398,6 +418,10 @@ def play() -> None:
     """
     The current game board.
     """
+    def reset_squares():
+        for sq in squares:
+            sq.dot = False
+
     screen.fill(BLACK)
 
     pygame.display.set_caption("Play")
@@ -426,6 +450,8 @@ def play() -> None:
             sq.draw(screen)
             squares.append(sq)
 
+    selected_piece = None
+
     while True:
         screen.fill(BLACK)
 
@@ -440,8 +466,6 @@ def play() -> None:
                 square.place_image(screen, piece.image)
                 square.has_piece = True
 
-        selected_piece = None
-
         # Pygame event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -455,13 +479,22 @@ def play() -> None:
                         clicked = square.check_position(mouse_pos)
                         if clicked:
                             piece = board.board[square.rank][square.file]
+                            reset_squares()
+                            if piece.letter.isupper() == bool(board.user_side):
+                                break
                             selected_piece = piece
-                            valid_moves = piece.valid_moves()
+                            valid_moves = piece.valid_moves(board)
                             for location in valid_moves:
-                                pass
+                                squares[coords_to_index(location)].dot = True
 
                     elif square.dot:
                         # move selected piece to dot.
-                        pass
+                        print((selected_piece.file, selected_piece.rank))
+                        print((square.file, square.rank))
+                        board.move((selected_piece.file, selected_piece.rank),
+                                   (square.file, square.rank))
+
+                    else:
+                        square.dot = False
 
         pygame.display.update()

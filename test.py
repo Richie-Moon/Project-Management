@@ -24,5 +24,7 @@
 #     print(info)
 # print('returned None')
 
-import board
-print(board.reverse_items(["1234", "i love cats", "4231"]))
+import gui
+x = 0
+y = 0
+print(gui.coords_to_index((x, y)))
