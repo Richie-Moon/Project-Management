@@ -431,6 +431,9 @@ def play() -> None:
     board_rect = pygame.Rect(TOPLEFT, (h, h))
     square_width: int = board_rect.width // NUM_FILES
     board.new_game(square_width)
+    if board.engine.is_ready() is False:
+        print("Engine failed to start or is not ready")
+        return
 
     # Draw board
     squares: list[Square] = []
@@ -465,19 +468,26 @@ def play() -> None:
             if piece is not None:
                 square.place_image(screen, piece.image)
                 square.has_piece = True
+            else:
+                square.has_piece = False
 
         # Pygame event loop
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 pygame.quit()
+
+            if board.turn is False:
+                board.engine_move()
+                continue
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_pos = pygame.mouse.get_pos()
 
                 for square in squares:
-                    if square.has_piece:
-                        clicked = square.check_position(mouse_pos)
-                        if clicked:
+                    clicked = square.check_position(mouse_pos)
+                    if clicked:
+                        if square.has_piece:
                             piece = board.board[square.rank][square.file]
                             reset_squares()
                             if piece.letter.isupper() == bool(board.user_side):
@@ -487,14 +497,13 @@ def play() -> None:
                             for location in valid_moves:
                                 squares[coords_to_index(location)].dot = True
 
-                    elif square.dot:
-                        # move selected piece to dot.
-                        print((selected_piece.file, selected_piece.rank))
-                        print((square.file, square.rank))
-                        board.move((selected_piece.file, selected_piece.rank),
-                                   (square.file, square.rank))
-
-                    else:
-                        square.dot = False
+                        elif square.dot:
+                            # move selected piece to dot.
+                            board.move((selected_piece.file,
+                                        selected_piece.rank),
+                                       (square.file, square.rank))
+                            reset_squares()
+                        else:
+                            reset_squares()
 
         pygame.display.update()

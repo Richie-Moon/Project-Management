@@ -17,15 +17,19 @@ def reverse_items(items: list[str]) -> list[str]:
 
     return reversed_items
 
+LEN_SQUARE = 2
 
 class Board:
     def __init__(self) -> None:
         self.LETTER_TO_PIECE = {'p': piece.Pawn, 'n': piece.Knight,
                                 'r': piece.Rook, 'q': piece.Queen,
                                 'k': piece.King}
-        self.NUM_TO_FILE = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f'}
+        self.NUM_TO_FILE: dict[int, str] = {0: 'a', 1: 'b', 2: 'c', 3: 'd',
+                                            4: 'e', 5: 'f'}
 
-        self.START_FEN: str = pyffish.start_fen('losalamos')
+        self.VARIANT = 'losalamos'
+
+        self.START_FEN: str = pyffish.start_fen(self.VARIANT)
         self.board_fen = self.START_FEN
         self.board: list[list[Type[piece.Piece] | None]] = []
         self.moves: list[str] = []
@@ -35,6 +39,10 @@ class Board:
 
         # 0 = white, 1 = black
         self.user_side: int = 0  # Could try other ways if int not good
+        if self.user_side == 0:
+            self.turn = True
+        else:
+            self.turn = False
 
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
 
@@ -77,15 +85,33 @@ class Board:
             self.board.append(rank_list)
 
     def move(self, start: tuple[int, int], end: tuple[int, int]) -> None:
-        # Could return something if needed (like piece, or captured piece)
+        # Could return something if needed (like piece moved, or captured
+        # piece)
 
-        print(self.board)
         s_file, s_rank = start
         e_file, e_rank = end
 
-        piece = self.board[s_file][s_rank]
+        piece = self.board[s_rank][s_file]
+        self.board[s_rank][s_file], self.board[e_rank][e_file] = None, piece
 
-        self.board[s_file][s_rank], self.board[e_file][e_rank] = None, piece
+        self.moves.append(self.coords_to_square(s_file, s_rank) +
+                          self.coords_to_square(e_file, e_rank))
+
+        self.engine.update(self.moves)
+        self.board_fen = pyffish.get_fen(self.VARIANT, self.START_FEN,
+                                         self.moves)
+
+        self.turn = not self.turn
+
+    def engine_move(self) -> None:
+        best_move = self.engine.get_move()
+        start = best_move[:LEN_SQUARE]
+        end = best_move[LEN_SQUARE:]
+
+        start_coords = self.square_to_coords(start)
+        end_coords = self.square_to_coords(end)
+
+        self.move(start_coords, end_coords)
 
     def on_square(self, file: int, rank: int) -> Type[piece.Piece] | None:
         """
@@ -111,3 +137,21 @@ class Board:
         """
         # Add 1 because of 0 indexing.
         return self.NUM_TO_FILE[file] + str(rank + 1)
+
+    def square_to_coords(self, square: str) -> tuple[int, int]:
+        keys, values = list(self.NUM_TO_FILE.keys()), \
+            list(self.NUM_TO_FILE.values())
+        file = keys[values.index(square[0])]
+        rank = int(square[1]) - 1
+        return file, rank
+
+    def print_board(self):
+        for rank in self.board:
+            txt = ""
+            for file in rank:
+                if file is None:
+                    txt += "0 "
+                else:
+                    txt += f"{file.letter} "
+            print(txt)
+        print()
