@@ -255,82 +255,82 @@ class Queen(Piece):
         file = self.file
         rank = self.rank
 
-        while rank < self.MAX_RANK:
-            # Up and Left
-            while file > self.MIN_FILE:
-                next_square = (file - 1, rank + 1)
-                on_square = board.on_square(*next_square)
+        # Up and Left
+        if not self.TOP:
+            if not self.LEFT:
+                while rank < self.MAX_RANK and file > self.MIN_FILE:
+                    next_square = (file - 1, rank + 1)
+                    on_square = board.on_square(*next_square)
 
-                if self.can_move(on_square):
-                    moves.append(next_square)
-                    file -= 1
-                    rank += 1
+                    if self.can_move(on_square):
+                        moves.append(next_square)
+                        file -= 1
+                        rank += 1
 
-                    if on_square is not None and on_square.letter.isupper() \
-                            is self.letter.islower():
+                        if on_square is not None and on_square.letter.isupper() \
+                                is self.letter.islower():
+                            break
+                    else:
                         break
-                else:
-                    break
 
-            # TODO prematurely breaks out of while loop if rank hits max_rank
-            #  first (doesn't run code below). Might have to try `if not
-            #  self.RIGHT/LEFT` etc
 
             # Up and Right
             file = self.file
             rank = self.rank
+            if not self.RIGHT:
+                while rank < self.MAX_RANK and file < self.MAX_FILE:
+                    next_square = (file + 1, rank + 1)
+                    on_square = board.on_square(*next_square)
 
-            while file < self.MAX_FILE:
-                next_square = (file + 1, rank + 1)
-                on_square = board.on_square(*next_square)
-
-                if self.can_move(on_square):
-                    moves.append(next_square)
-                    file += 1
-                    rank += 1
-                    if on_square is not None and on_square.letter.isupper() \
-                            is self.letter.islower():
+                    if self.can_move(on_square):
+                        moves.append(next_square)
+                        file += 1
+                        rank += 1
+                        if on_square is not None and on_square.letter.isupper() \
+                                is self.letter.islower():
+                            break
+                    else:
                         break
-                else:
-                    break
 
         rank = self.rank
         file = self.file
 
-        while rank > self.MIN_RANK:
-            # Down and left
-            while file > self.MIN_FILE:
-                next_square = (file - 1, rank - 1)
-                on_square = board.on_square(*next_square)
+        if not self.BOTTOM:
+            if not self.LEFT:
+                # Down and left
+                while rank > self.MIN_RANK and file > self.MIN_FILE:
+                    next_square = (file - 1, rank - 1)
+                    on_square = board.on_square(*next_square)
 
-                if self.can_move(on_square):
-                    moves.append(next_square)
-                    file -= 1
-                    rank -= 1
-                    if on_square is not None and \
-                            on_square.letter.isupper() is \
-                            self.letter.islower():
+                    if self.can_move(on_square):
+                        moves.append(next_square)
+                        file -= 1
+                        rank -= 1
+                        if on_square is not None and \
+                                on_square.letter.isupper() is \
+                                self.letter.islower():
+                            break
+                    else:
                         break
-                else:
-                    break
 
             # Down and Right
             file = self.file
             rank = self.rank
 
-            while file < self.MAX_FILE:
-                next_square = (file + 1, rank - 1)
-                on_square = board.on_square(*next_square)
+            if not self.RIGHT:
+                while rank > self.MIN_RANK and file < self.MAX_FILE:
+                    next_square = (file + 1, rank - 1)
+                    on_square = board.on_square(*next_square)
 
-                if self.can_move(on_square):
-                    moves.append(next_square)
-                    file += 1
-                    rank -= 1
-                    if on_square is not None and on_square.letter.isupper() \
-                            is self.letter.islower():
+                    if self.can_move(on_square):
+                        moves.append(next_square)
+                        file += 1
+                        rank -= 1
+                        if on_square is not None and on_square.letter.isupper() \
+                                is self.letter.islower():
+                            break
+                    else:
                         break
-                else:
-                    break
 
         return moves
 
