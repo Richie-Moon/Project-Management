@@ -20,6 +20,12 @@ class Piece:
 
         self.image = pygame.transform.smoothscale(image, (w, w))
 
+        self.update()
+
+    def square(self) -> tuple[int, int]:
+        return self.file, self.rank
+
+    def update(self):
         if self.file == self.MIN_FILE:
             self.LEFT = True
         elif self.file == self.MAX_FILE:
@@ -29,9 +35,6 @@ class Piece:
             self.BOTTOM = True
         elif self.rank == self.MAX_RANK:
             self.TOP = True
-
-    def square(self) -> tuple[int, int]:
-        return self.file, self.rank
 
     # def print_info(self):
     #     print(self.file)

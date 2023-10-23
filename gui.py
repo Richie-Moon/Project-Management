@@ -37,7 +37,6 @@ NUM_FILES = 6
 NUM_RANKS = 6
 NUM_SQUARES = 36
 
-
 board = board.Board()
 
 pygame.init()
@@ -418,6 +417,7 @@ def play() -> None:
     """
     The current game board.
     """
+
     def reset_squares():
         for sq in squares:
             sq.dot = False
@@ -431,6 +431,7 @@ def play() -> None:
     board_rect = pygame.Rect(TOPLEFT, (h, h))
     square_width: int = board_rect.width // NUM_FILES
     board.new_game(square_width)
+
     if board.engine.is_ready() is False:
         print("Engine failed to start or is not ready")
         return
@@ -454,6 +455,8 @@ def play() -> None:
             squares.append(sq)
 
     selected_piece = None
+    user_captured = []
+    engine_captured = []
 
     while True:
         screen.fill(BLACK)
@@ -489,21 +492,37 @@ def play() -> None:
                     if clicked:
                         if square.has_piece:
                             piece = board.board[square.rank][square.file]
-                            reset_squares()
-                            if piece.letter.isupper() == bool(board.user_side):
-                                break
-                            selected_piece = piece
-                            valid_moves = piece.valid_moves(board)
-                            for location in valid_moves:
-                                squares[coords_to_index(location)].dot = True
+                            # if the piece is not the users colour
+                            if piece.letter.isupper() is not bool(
+                                    board.user_side):
+                                reset_squares()
+                                selected_piece = piece
+                                valid_moves = piece.valid_moves(board)
+                                print(valid_moves)
+                                for location in valid_moves:
+                                    squares[
+                                        coords_to_index(location)].dot = True
 
-                        elif square.dot:
+                        if square.dot:
                             # move selected piece to dot.
-                            board.move((selected_piece.file,
-                                        selected_piece.rank),
-                                       (square.file, square.rank))
-                            reset_squares()
-                        else:
+                            captured = board.move((selected_piece.file,
+                                                   selected_piece.rank),
+                                                  (square.file, square.rank))
+                            if captured is not None:
+                                # will be True if user playing white, False if
+                                # user playing black.
+                                user_side = not board.user_side
+                                if user_side is captured.letter.islower():
+                                    user_captured.append(captured)
+                                else:
+                                    engine_captured.append(captured)
+
+                            square.has_piece = True
+                            squares[coords_to_index((selected_piece.file,
+                                                     selected_piece.rank))].\
+                                has_piece = False
+                            selected_piece.file = square.file
+                            selected_piece.rank = square.rank
                             reset_squares()
 
         pygame.display.update()

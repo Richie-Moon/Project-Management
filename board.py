@@ -4,6 +4,8 @@ from typing import Type
 import engine
 import pygame
 
+from piece import Piece
+
 
 def reverse_items(items: list[str]) -> list[str]:
     """
@@ -17,7 +19,9 @@ def reverse_items(items: list[str]) -> list[str]:
 
     return reversed_items
 
+
 LEN_SQUARE = 2
+
 
 class Board:
     def __init__(self) -> None:
@@ -84,14 +88,21 @@ class Board:
 
             self.board.append(rank_list)
 
-    def move(self, start: tuple[int, int], end: tuple[int, int]) -> None:
-        # Could return something if needed (like piece moved, or captured
-        # piece)
+    def move(self, start: tuple[int, int], end: tuple[int, int]) -> \
+            Type[Piece] | None:
+        """
+
+        :param start: The co-ordinates of the piece to move.
+        :param end: The co-ordinates of where the piece should move to.
+        :return: The captured Piece, if there was one. None, if there wasn't
+        """
 
         s_file, s_rank = start
         e_file, e_rank = end
 
         piece = self.board[s_rank][s_file]
+        captured = self.board[e_rank][e_file]
+
         self.board[s_rank][s_file], self.board[e_rank][e_file] = None, piece
 
         self.moves.append(self.coords_to_square(s_file, s_rank) +
@@ -102,11 +113,13 @@ class Board:
                                          self.moves)
 
         self.turn = not self.turn
+        return captured
 
     def engine_move(self) -> None:
         best_move = self.engine.get_move()
-        start = best_move[:LEN_SQUARE]
-        end = best_move[LEN_SQUARE:]
+        # This won't work for promotions.
+        start = best_move[:LEN_SQUARE]  # first 2 chars
+        end = best_move[LEN_SQUARE:]  # last 2 chars
 
         start_coords = self.square_to_coords(start)
         end_coords = self.square_to_coords(end)

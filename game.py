@@ -30,7 +30,7 @@ class Square:
         self.rank = rank
         self.coords = (file, rank)
 
-        # Create rect for square
+        # Create rect object for square
         self.rect = pygame.Rect(self.x_pos, self.y_pos, w, w)
 
         self.has_piece: bool = False
