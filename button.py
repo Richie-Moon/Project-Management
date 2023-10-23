@@ -107,4 +107,3 @@ class ImageButton(Button):
 
     def disable(self):
         self.bg_base_colour = self.base_colour_record
-

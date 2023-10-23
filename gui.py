@@ -523,6 +523,8 @@ def play() -> None:
                                 has_piece = False
                             selected_piece.file = square.file
                             selected_piece.rank = square.rank
+                            selected_piece.update()
+
                             reset_squares()
 
         pygame.display.update()

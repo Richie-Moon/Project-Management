@@ -139,7 +139,7 @@ class Board:
         if (file < 0 or file > self.MAX_FILE - 1) or \
                 (rank < 0 or rank > self.MAX_RANK - 1):
             raise ValueError("Parameters `file` and `rank` must be between 0 "
-                             "and 5 (inclusive). ")
+                             f"and 5 (inclusive). File: {file}, Rank: {rank}")
 
         return self.board[rank][file]
 

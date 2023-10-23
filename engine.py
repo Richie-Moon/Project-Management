@@ -1,8 +1,6 @@
 import subprocess
-import pyffish
 import threading
 from typing import Generator, Any
-import time
 
 # https://github.com/fairy-stockfish/FairyFishGUI/blob/main/fairyfishgui.py
 # Note: Engine knows which side to calculate for using FEN.

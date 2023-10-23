@@ -64,6 +64,6 @@ class Square:
     # For testing
     def show_coords(self, screen: pygame.Surface, text: pygame.font.Font):
         text = text.render(f"{self.file}, {self.rank}", True, 'black')
-        rect = text.get_rect(center=(self.x_pos + self.w // 2,
-                                     self.y_pos + self.w // 2))
+        rect = text.get_rect(center=(self.x_pos + self.w * HALF,
+                                     self.y_pos + self.w * HALF))
         screen.blit(text, rect)
