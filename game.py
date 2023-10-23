@@ -2,7 +2,7 @@ import pygame
 
 LIGHT = (207, 177, 129)
 DARK = (129, 92, 60)
-GRAY = (211, 211, 211)
+GRAY = (211, 211, 211, 160)
 
 HALF = 0.5
 CIRCLE_RADIUS = 5
@@ -35,28 +35,31 @@ class Square:
 
         self.has_piece: bool = False
 
-    def draw(self, screen: pygame.Surface):
+        # Surface for dot (required for transparency).
+        self.dot_surface = pygame.Surface((w, w), pygame.SRCALPHA)
+
+    def draw(self, screen: pygame.Surface, image: pygame.Surface = None):
         if self.light:
             pygame.draw.rect(screen, LIGHT, self.rect)
         if not self.light:
             pygame.draw.rect(screen, DARK, self.rect)
 
+        if self.has_piece:
+            screen.blit(image, self.rect)
+
         if self.dot:
-            pygame.draw.circle(screen, GRAY, (self.x_pos + self.w * HALF,
-                                              self.y_pos+self.w * HALF),
+            pygame.draw.circle(self.dot_surface, GRAY,
+                               (self.dot_surface.get_width() * HALF,
+                                self.dot_surface.get_width() * HALF),
                                self.w // CIRCLE_RADIUS)
 
-    def update(self, board: list[list]):
-        pass
+            screen.blit(self.dot_surface, self.rect)
 
     def check_position(self, position: tuple[int, int]) -> bool:
         if (position[0] in range(self.rect.left, self.rect.right) and
                 position[1] in range(self.rect.top, self.rect.bottom)):
             return True
         return False
-
-    def place_image(self, screen: pygame.Surface, image: pygame.Surface):
-        screen.blit(image, self.rect)
 
     # For testing
     def show_coords(self, screen: pygame.Surface, text: pygame.font.Font):

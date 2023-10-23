@@ -460,19 +460,20 @@ def play() -> None:
 
     while True:
         screen.fill(BLACK)
-
+        #
         # Draw the board
-        for sq in squares:
-            sq.draw(screen)
+        # for sq in squares:
+        #     sq.draw(screen)
 
         # Place images pieces onto board
         for square in squares:
             piece = board.board[square.rank][square.file]
             if piece is not None:
-                square.place_image(screen, piece.image)
                 square.has_piece = True
+                square.draw(screen, piece.image)
             else:
                 square.has_piece = False
+                square.draw(screen)
 
         # Pygame event loop
         for event in pygame.event.get():
@@ -498,7 +499,6 @@ def play() -> None:
                                 reset_squares()
                                 selected_piece = piece
                                 valid_moves = piece.valid_moves(board)
-                                print(valid_moves)
                                 for location in valid_moves:
                                     squares[
                                         coords_to_index(location)].dot = True
