@@ -3,7 +3,6 @@ import piece
 from typing import Type
 import engine
 import pygame
-
 from piece import Piece
 
 
@@ -117,7 +116,7 @@ class Board:
 
     def engine_move(self) -> None:
         best_move = self.engine.get_move()
-        # This won't work for promotions.
+        # This won't work for promotions. Add len check?
         start = best_move[:LEN_SQUARE]  # first 2 chars
         end = best_move[LEN_SQUARE:]  # last 2 chars
 

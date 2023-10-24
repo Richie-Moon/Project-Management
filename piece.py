@@ -51,6 +51,24 @@ class Piece:
             return True
         return False
 
+    def check_valid_moves(self, moves: list[tuple[int, int]],
+                          board) -> list[tuple[int, int]]:
+        valid_moves = pyffish.legal_moves(board.VARIANT, board.START_FEN,
+                                          board.moves)
+
+        for i in range(len(moves)):
+            moves[i] = board.coords_to_square(self.file, self.rank) +\
+                       board.coords_to_square(*moves[i])
+
+        moves_to_return = []
+        for move in moves:
+            if move in valid_moves:
+                print('move', move)
+                moves_to_return.append(board.square_to_coords(move))
+
+        print(moves_to_return)
+        return moves_to_return
+
     # def print_info(self):
     #     print(self.file)
     #     print(self.rank)
@@ -381,4 +399,4 @@ class King(Piece):
             if self.can_move(board.on_square(*right)):
                 moves.append(right)
 
-        return moves
+        return self.check_valid_moves(moves, board)

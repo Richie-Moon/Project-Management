@@ -460,10 +460,6 @@ def play() -> None:
 
     while True:
         screen.fill(BLACK)
-        #
-        # Draw the board
-        # for sq in squares:
-        #     sq.draw(screen)
 
         # Place images pieces onto board
         for square in squares:
@@ -474,6 +470,9 @@ def play() -> None:
             else:
                 square.has_piece = False
                 square.draw(screen)
+
+        for sq in squares:
+            sq.show_coords(screen, get_font(30))
 
         # Pygame event loop
         for event in pygame.event.get():
