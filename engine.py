@@ -65,6 +65,7 @@ class Engine:
         """
         self.write(f"setoption name UCI_Elo value {elo}\n")
         self.elo = elo
+        # TODO elo gets changed back to default when starting game
 
     # def get_position(self) -> str:
     #     self.write("d\n")

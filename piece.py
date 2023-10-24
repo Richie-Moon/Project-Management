@@ -286,8 +286,9 @@ class Queen(Piece):
                         moves.append(next_square)
                         file += 1
                         rank += 1
-                        if on_square is not None and on_square.letter.isupper() \
-                                is self.letter.islower():
+                        if (on_square is not None and
+                                on_square.letter.isupper()
+                                is self.letter.islower()):
                             break
                     else:
                         break
@@ -326,8 +327,9 @@ class Queen(Piece):
                         moves.append(next_square)
                         file += 1
                         rank -= 1
-                        if on_square is not None and on_square.letter.isupper() \
-                                is self.letter.islower():
+                        if (on_square is not None and
+                                on_square.letter.isupper()
+                                is self.letter.islower()):
                             break
                     else:
                         break
@@ -342,4 +344,13 @@ class King(Piece):
 
     def valid_moves(self, board) -> list:
         moves = []
+
+        # Adjacent Squares
+        if not self.LEFT:
+            left = (self.file - 1, self.rank)
+            on_left = board.on_square(left)
+            if self.can_move(on_left):
+                moves.append(on_left)
+        # Diagonal Squares
+
         return moves
