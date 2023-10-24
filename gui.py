@@ -471,8 +471,9 @@ def play() -> None:
                 square.has_piece = False
                 square.draw(screen)
 
-        for sq in squares:
-            sq.show_coords(screen, get_font(30))
+        # Show square coords for testing.
+        # for sq in squares:
+        #     sq.show_coords(screen, get_font(30))
 
         # Pygame event loop
         for event in pygame.event.get():

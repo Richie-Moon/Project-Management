@@ -27,6 +27,9 @@ class Engine:
         # The amount of time for the engine to think. Given in milliseconds.
         self.move_time: int = 2000
 
+        self.new_game()
+        self.change_elo(self.DEFAULT_ELO)
+
     def write(self, message: str) -> None:
         with self.lock:
             self.process.stdin.write(message)
@@ -48,7 +51,6 @@ class Engine:
         self.write(f"position startpos\n")
 
         self.write("setoption name UCI_LimitStrength value true\n")
-        self.change_elo(self.DEFAULT_ELO)
 
     def is_ready(self) -> bool:
         self.write("isready\n")
@@ -65,7 +67,7 @@ class Engine:
         """
         self.write(f"setoption name UCI_Elo value {elo}\n")
         self.elo = elo
-        # TODO elo gets changed back to default when starting game
+        print(self.elo)
 
     # def get_position(self) -> str:
     #     self.write("d\n")

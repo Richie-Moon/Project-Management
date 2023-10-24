@@ -1,5 +1,6 @@
 import pygame
 import pyffish
+END = 2
 
 
 class Piece:
@@ -63,10 +64,8 @@ class Piece:
         moves_to_return = []
         for move in moves:
             if move in valid_moves:
-                print('move', move)
-                moves_to_return.append(board.square_to_coords(move))
+                moves_to_return.append(board.square_to_coords(move[END:]))
 
-        print(moves_to_return)
         return moves_to_return
 
     # def print_info(self):
@@ -106,7 +105,7 @@ class Pawn(Piece):
                     self.letter.isupper()):
                 moves.append(right)
 
-        return moves
+        return self.check_valid_moves(moves, board)
 
 
 class Knight(Piece):
@@ -174,18 +173,18 @@ class Knight(Piece):
             # 2 right, 1 down
             if self.file + 2 <= self.MAX_FILE:
                 move_down = (self.file + 2, down)
-                on_right_down = board.on_square(move_down)
+                on_right_down = board.on_square(*move_down)
                 if self.can_move(on_right_down):
                     moves.append(move_down)
 
             # 2 left, 1 down
             if self.file - 2 >= self.MIN_FILE:
                 move_down = (self.file - 2, down)
-                on_left_down = board.on_square(move_down)
+                on_left_down = board.on_square(*move_down)
                 if self.can_move(on_left_down):
                     moves.append(move_down)
 
-        return moves
+        return self.check_valid_moves(moves, board)
 
 
 class Rook(Piece):
@@ -258,7 +257,7 @@ class Rook(Piece):
             else:
                 break
 
-        return moves
+        return self.check_valid_moves(moves, board)
 
 
 class Queen(Piece):
@@ -357,7 +356,7 @@ class Queen(Piece):
                     else:
                         break
 
-        return moves
+        return self.check_valid_moves(moves, board)
 
 
 class King(Piece):
@@ -377,7 +376,6 @@ class King(Piece):
                 if self.can_move(board.on_square(*move)):
                     moves.append(move)
 
-        # can this be an elif? idk too tired rn
         if not self.TOP:
             move_up = self.rank + 1
             moves_up = [(self.file - 1, move_up), (self.file, move_up),
@@ -393,7 +391,6 @@ class King(Piece):
             if self.can_move(board.on_square(*left)):
                 moves.append(left)
 
-        # also an elif?
         if not self.RIGHT:
             right = (self.file + 1, self.rank)
             if self.can_move(board.on_square(*right)):
