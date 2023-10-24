@@ -1,4 +1,5 @@
 import pygame
+import pyffish
 
 
 class Piece:
@@ -26,7 +27,12 @@ class Piece:
     def square(self) -> tuple[int, int]:
         return self.file, self.rank
 
-    def update(self):
+    def update(self) -> None:
+        self.LEFT = False
+        self.RIGHT = False
+        self.TOP = False
+        self.BOTTOM = False
+
         if self.file == self.MIN_FILE:
             self.LEFT = True
         elif self.file == self.MAX_FILE:
@@ -273,7 +279,6 @@ class Queen(Piece):
                     else:
                         break
 
-
             # Up and Right
             file = self.file
             rank = self.rank
@@ -345,12 +350,35 @@ class King(Piece):
     def valid_moves(self, board) -> list:
         moves = []
 
-        # Adjacent Squares
+        if not self.BOTTOM:
+            move_down = self.rank - 1
+            moves_down = [(self.file - 1, move_down), (self.file, move_down),
+                          (self.file + 1, move_down)]
+
+            for move in moves_down:
+                if self.can_move(board.on_square(*move)):
+                    moves.append(move)
+
+        # can this be an elif? idk too tired rn
+        if not self.TOP:
+            move_up = self.rank + 1
+            moves_up = [(self.file - 1, move_up), (self.file, move_up),
+                        (self.file + 1, move_up)]
+
+            for move in moves_up:
+                if self.can_move(board.on_square(*move)):
+                    moves.append(move)
+
+        # Can just check for adjacent square, diagonals were checked above
         if not self.LEFT:
             left = (self.file - 1, self.rank)
-            on_left = board.on_square(left)
-            if self.can_move(on_left):
-                moves.append(on_left)
-        # Diagonal Squares
+            if self.can_move(board.on_square(*left)):
+                moves.append(left)
+
+        # also an elif?
+        if not self.RIGHT:
+            right = (self.file + 1, self.rank)
+            if self.can_move(board.on_square(*right)):
+                moves.append(right)
 
         return moves
