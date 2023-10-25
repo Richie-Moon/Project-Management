@@ -471,6 +471,11 @@ def play() -> None:
                 square.has_piece = False
                 square.draw(screen)
 
+        pygame.display.update()
+
+        if board.check_end_game() is not None:
+            return
+
         if board.turn is False:
             # Change to opponents turn
             # pygame.display.update()
@@ -530,6 +535,6 @@ def play() -> None:
 
                             reset_squares()
 
-                            print(board.check_end_game())
+
 
         pygame.display.update()

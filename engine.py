@@ -9,8 +9,6 @@ BEST_MOVE_POS = 1
 
 
 class Engine:
-    engine_vars = {'depth': int}
-
     def __init__(self, path: list) -> None:
         self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE,
@@ -25,8 +23,9 @@ class Engine:
         self.moves = []
 
         # The amount of time for the engine to think. Given in milliseconds.
-        self.move_time: int = 2000
+        self.move_time: int = 1500
 
+        self.write("setoption name UCI_LimitStrength value true\n")
         self.change_elo(self.DEFAULT_ELO)
 
     def write(self, message: str) -> None:
@@ -48,8 +47,6 @@ class Engine:
 
         self.write("setoption name UCI_Variant value losalamos\n")
         self.write(f"position startpos\n")
-
-        self.write("setoption name UCI_LimitStrength value true\n")
 
     def is_ready(self) -> bool:
         self.write("isready\n")
@@ -82,16 +79,16 @@ class Engine:
         """
         :param fen: The FEN string of the current position.
         """
+        print(fen)
         self.write(f"position fen {fen}")
+        self.write('d\n')
 
     def get_move(self) -> str:
         """
         Calculates the best next move.
         :return: Returns the best calculated move in LAN.
         """
-        self.write('d\n')
         self.write(f"go movetime {self.move_time}\n")
         best_move = self.response("bestmove")
-        print(best_move)
         # best_move is in the format 'bestmove a1a2 ponder b1b2'.
         return best_move.split()[BEST_MOVE_POS]

@@ -55,6 +55,7 @@ class Board:
         self.moves = []
 
         self.fen_to_board(self.START_FEN, w)
+        self.engine.new_game()
 
         if self.user_side == 0:
             self.turn = True
@@ -247,7 +248,9 @@ class Board:
             elif (self.turn and not is_white) or (not self.turn and is_white):
                 return_dict['result'] = WHITE_WIN
 
-            return None
+            return return_dict
+
+        return None
 
     def print_board(self):
         for rank in self.board:
