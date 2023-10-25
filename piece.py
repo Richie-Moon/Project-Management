@@ -69,6 +69,11 @@ class Piece:
         black = True if board.user_side == 1 else False
         for i in range(len(moves_square)):
             move = moves_square[i]
+
+            # For every move in moves_square, switch sides if user is playing
+            # black. Then check if it's in the valid_moves list. If so, add
+            # the co-ordinate version of the square into moves_to_return.
+
             if black:
                 start_square = board.switch_side_square(move[:END])
                 end_square = board.switch_side_square(move[END:])
@@ -381,8 +386,12 @@ class King(Piece):
 
         if not self.BOTTOM:
             move_down = self.rank - 1
-            moves_down = [(self.file - 1, move_down), (self.file, move_down),
-                          (self.file + 1, move_down)]
+            moves_down = [(self.file, move_down)]
+
+            if not self.LEFT:
+                moves_down.append((self.file - 1, move_down))
+            if not self.RIGHT:
+                moves_down.append((self.file + 1, move_down))
 
             for move in moves_down:
                 if self.can_move(board.on_square(*move)):
@@ -390,8 +399,12 @@ class King(Piece):
 
         if not self.TOP:
             move_up = self.rank + 1
-            moves_up = [(self.file - 1, move_up), (self.file, move_up),
-                        (self.file + 1, move_up)]
+            moves_up = [(self.file, move_up)]
+
+            if not self.LEFT:
+                moves_up.append((self.file - 1, move_up))
+            if not self.RIGHT:
+                moves_up.append((self.file + 1, move_up))
 
             for move in moves_up:
                 if self.can_move(board.on_square(*move)):

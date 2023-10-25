@@ -47,13 +47,13 @@ class Board:
         self.turn = True
 
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
+        self.engine.new_game()
 
     def new_game(self, w: int) -> None:
         # Reset instance variables.
         self.board = []
         self.moves = []
 
-        self.engine.new_game()
         self.fen_to_board(self.START_FEN, w)
 
         if self.user_side == 0:
@@ -61,7 +61,14 @@ class Board:
         else:
             self.turn = False
 
-    def fen_to_board(self, fen: str, w: int):
+    def fen_to_board(self, fen: str, w: int) -> None:
+        """
+        Sets the internal board to the position described in the FEN string.
+        :param fen: The FEN string position to set the board to.
+        :param w: The width of the square. Passed into the Piece classes,
+         not used in this function.
+        :return:
+        """
         # Split the extra info off from the end of the fen
         split_fen = fen.split(' ')
         # Splits each rank into its own item in the list.
@@ -117,9 +124,9 @@ class Board:
             else:
                 self.moves.append(start_square + end_square)
 
-        self.engine.update(self.moves)
         self.board_fen = pyffish.get_fen(self.VARIANT, self.START_FEN,
                                          self.moves)
+        self.engine.update(self.board_fen)
 
         self.turn = not self.turn
         return captured
@@ -140,7 +147,13 @@ class Board:
         else:
             self.move(start_coords, end_coords)
 
-    def switch_side(self, move: tuple[int, int]):
+    def switch_side(self, move: tuple[int, int]) -> tuple[int, int]:
+        """
+        Returns the co-ordinates of the square given from the opponents'
+        perspective.
+        :param move: The move to switch sides.
+        :return: The co-ordinates of the switched square.
+        """
         old_file = move[0]
         old_rank = move[1]
 
@@ -162,7 +175,8 @@ class Board:
         if (file < 0 or file > self.MAX_FILE - 1) or \
                 (rank < 0 or rank > self.MAX_RANK - 1):
             raise ValueError("Parameters `file` and `rank` must be between 0 "
-                             f"and 5 (inclusive). File: {file}, Rank: {rank}")
+                             f"and 5 (inclusive). \n"
+                             f"File: {file}, Rank: {rank}")
 
         return self.board[rank][file]
 
@@ -190,12 +204,50 @@ class Board:
         rank = int(square[1]) - 1
         return file, rank
 
-    def check_end_game(self):
-        # TODO
+    def board_valid_moves(self) -> list[str]:
+        """
+        Gets all the valid moves on the board for the current players turn.
+        :return: Returns a list of all valid moves, given in LAN.
+        """
+
+        return pyffish.legal_moves(self.VARIANT, self.START_FEN, self.moves)
+
+    def check_end_game(self) -> dict | None:
+        """
+        Checks for Checkmate and Stalemate. Can also put timeout into this
+        function?
+        :return: Returns a dict with keys `result` and `reason`. `result` is
+         an integer, where -1 means draw, 0 means white wins, and 1 means
+         black wins. `reason` is the reason for the result (i.e. Checkmate or
+          Draw by insufficient Material).
+        """
+        DRAW = -1
+        WHITE_WIN = 0
+        BLACK_WIN = 1
+        return_dict = {}
+
         # Draw by insufficient material
         insufficient_mat = pyffish.has_insufficient_material(self.VARIANT,
                                                              self.board_fen,
                                                              [])
+        if insufficient_mat == (True, True):
+            return_dict['result'] = DRAW
+            return_dict['reason'] = "Draw by Insufficient Material"
+            return return_dict
+
+        # Checkmate
+        if pyffish.gives_check(self.VARIANT, self.START_FEN, self.moves) \
+                and len(self.board_valid_moves()) == 0:
+            return_dict['reason'] = 'CHECKMATE'
+            is_white = not bool(self.user_side)
+
+            if (self.turn and is_white) or (not self.turn and not is_white):
+                return_dict['result'] = BLACK_WIN
+
+            elif (self.turn and not is_white) or (not self.turn and is_white):
+                return_dict['result'] = WHITE_WIN
+
+            return None
 
     def print_board(self):
         for rank in self.board:

@@ -471,19 +471,21 @@ def play() -> None:
                 square.has_piece = False
                 square.draw(screen)
 
-        # Show square coords for testing.
-        for sq in squares:
-            sq.show_coords(screen, get_font(30))
+        if board.turn is False:
+            # Change to opponents turn
+            # pygame.display.update()
+            board.engine_move()
+            continue
+
+        # # Show square coords for testing.
+        # for sq in squares:
+        #     sq.show_coords(screen, get_font(30))
 
         # Pygame event loop
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
                 pygame.quit()
-
-            if board.turn is False:
-                board.engine_move()
-                continue
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_pos = pygame.mouse.get_pos()
@@ -527,5 +529,7 @@ def play() -> None:
                             selected_piece.update()
 
                             reset_squares()
+
+                            print(board.check_end_game())
 
         pygame.display.update()

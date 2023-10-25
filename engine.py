@@ -27,7 +27,6 @@ class Engine:
         # The amount of time for the engine to think. Given in milliseconds.
         self.move_time: int = 2000
 
-        self.new_game()
         self.change_elo(self.DEFAULT_ELO)
 
     def write(self, message: str) -> None:
@@ -75,24 +74,24 @@ class Engine:
 
     def response(self, phrase: str):
         for line in self.read():
-            # print(line)
+            print(line)
             if phrase in line:
                 return line
 
-    def update(self, moves: list):
+    def update(self, fen: str) -> None:
         """
-        :param moves: The move to make on the board, given in LAN
-         (Long Algebraic Notation).
+        :param fen: The FEN string of the current position.
         """
-        moves_str = " ".join(moves)
-        self.write(f"position startpos move {moves_str}\n")
+        self.write(f"position fen {fen}")
 
     def get_move(self) -> str:
         """
         Calculates the best next move.
         :return: Returns the best calculated move in LAN.
         """
+        self.write('d\n')
         self.write(f"go movetime {self.move_time}\n")
         best_move = self.response("bestmove")
+        print(best_move)
         # best_move is in the format 'bestmove a1a2 ponder b1b2'.
         return best_move.split()[BEST_MOVE_POS]
