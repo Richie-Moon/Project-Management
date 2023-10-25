@@ -29,6 +29,8 @@ class Board:
                                 'k': piece.King}
         self.NUM_TO_FILE: dict[int, str] = {0: 'a', 1: 'b', 2: 'c', 3: 'd',
                                             4: 'e', 5: 'f'}
+        self.FILE_TO_NUM: dict[str, int] = {'a': 0, 'b': 1, 'c': 2, 'd': 3,
+                                            'e': 4, 'f': 5}
 
         self.VARIANT = 'losalamos'
 
@@ -42,10 +44,7 @@ class Board:
 
         # 0 = white, 1 = black
         self.user_side: int = 0  # Could try other ways if int not good
-        if self.user_side == 0:
-            self.turn = True
-        else:
-            self.turn = False
+        self.turn = True
 
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
 
@@ -56,6 +55,11 @@ class Board:
 
         self.engine.new_game()
         self.fen_to_board(self.START_FEN, w)
+
+        if self.user_side == 0:
+            self.turn = True
+        else:
+            self.turn = False
 
     def fen_to_board(self, fen: str, w: int):
         # Split the extra info off from the end of the fen
@@ -104,8 +108,14 @@ class Board:
 
         self.board[s_rank][s_file], self.board[e_rank][e_file] = None, piece
 
-        self.moves.append(self.coords_to_square(s_file, s_rank) +
-                          self.coords_to_square(e_file, e_rank))
+        if self.turn:
+            start_square = self.coords_to_square(s_file, s_rank)
+            end_square = self.coords_to_square(e_file, e_rank)
+            if self.user_side == 1:
+                self.moves.append(self.switch_side_square(start_square) +
+                                  self.switch_side_square(end_square))
+            else:
+                self.moves.append(start_square + end_square)
 
         self.engine.update(self.moves)
         self.board_fen = pyffish.get_fen(self.VARIANT, self.START_FEN,
@@ -123,7 +133,21 @@ class Board:
         start_coords = self.square_to_coords(start)
         end_coords = self.square_to_coords(end)
 
-        self.move(start_coords, end_coords)
+        self.moves.append(start + end)
+        if self.user_side == 1:
+            self.move(self.switch_side(start_coords),
+                      self.switch_side(end_coords))
+        else:
+            self.move(start_coords, end_coords)
+
+    def switch_side(self, move: tuple[int, int]):
+        old_file = move[0]
+        old_rank = move[1]
+
+        new_file = self.MAX_FILE - 1 - old_file
+        new_rank = self.MAX_RANK - 1 - old_rank
+
+        return new_file, new_rank
 
     def on_square(self, file: int, rank: int) -> Type[piece.Piece] | None:
         """
@@ -150,12 +174,28 @@ class Board:
         # Add 1 because of 0 indexing.
         return self.NUM_TO_FILE[file] + str(rank + 1)
 
+    def switch_side_square(self, square: str) -> str:
+        """
+
+        :param square: The square to switch side
+        :return: The switched square
+        """
+        file, rank = self.square_to_coords(square)
+
+        new_file, new_rank = self.switch_side((file, rank))
+        return self.coords_to_square(new_file, new_rank)
+
     def square_to_coords(self, square: str) -> tuple[int, int]:
-        keys, values = list(self.NUM_TO_FILE.keys()), \
-            list(self.NUM_TO_FILE.values())
-        file = keys[values.index(square[0])]
+        file = self.FILE_TO_NUM[square[0]]
         rank = int(square[1]) - 1
         return file, rank
+
+    def check_end_game(self):
+        # TODO
+        # Draw by insufficient material
+        insufficient_mat = pyffish.has_insufficient_material(self.VARIANT,
+                                                             self.board_fen,
+                                                             [])
 
     def print_board(self):
         for rank in self.board:

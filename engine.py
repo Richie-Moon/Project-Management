@@ -67,7 +67,6 @@ class Engine:
         """
         self.write(f"setoption name UCI_Elo value {elo}\n")
         self.elo = elo
-        print(self.elo)
 
     # def get_position(self) -> str:
     #     self.write("d\n")

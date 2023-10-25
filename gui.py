@@ -472,8 +472,8 @@ def play() -> None:
                 square.draw(screen)
 
         # Show square coords for testing.
-        # for sq in squares:
-        #     sq.show_coords(screen, get_font(30))
+        for sq in squares:
+            sq.show_coords(screen, get_font(30))
 
         # Pygame event loop
         for event in pygame.event.get():
@@ -499,6 +499,7 @@ def play() -> None:
                                 reset_squares()
                                 selected_piece = piece
                                 valid_moves = piece.valid_moves(board)
+                                print(valid_moves)
                                 for location in valid_moves:
                                     squares[
                                         coords_to_index(location)].dot = True

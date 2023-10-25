@@ -54,18 +54,30 @@ class Piece:
 
     def check_valid_moves(self, moves: list[tuple[int, int]],
                           board) -> list[tuple[int, int]]:
+
         valid_moves = pyffish.legal_moves(board.VARIANT, board.START_FEN,
                                           board.moves)
 
+        moves_square = []
+
         for i in range(len(moves)):
-            moves[i] = board.coords_to_square(self.file, self.rank) +\
-                       board.coords_to_square(*moves[i])
+            moves_square.append(board.coords_to_square(self.file, self.rank)
+                                + board.coords_to_square(*moves[i]))
 
         moves_to_return = []
-        for move in moves:
-            if move in valid_moves:
-                moves_to_return.append(board.square_to_coords(move[END:]))
 
+        black = True if board.user_side == 1 else False
+        for i in range(len(moves_square)):
+            move = moves_square[i]
+            if black:
+                start_square = board.switch_side_square(move[:END])
+                end_square = board.switch_side_square(move[END:])
+                square = start_square + end_square
+            else:
+                square = move
+
+            if square in valid_moves:
+                moves_to_return.append(moves[i])
         return moves_to_return
 
     # def print_info(self):
