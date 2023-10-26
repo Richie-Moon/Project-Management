@@ -1,15 +1,23 @@
-import pyffish
-result = pyffish.legal_moves('losalamos', '6/1P5/6/K3k1/1p5/6 b - - 0 1', [])
+import pygame_widgets
+import pygame
+from pygame_widgets.toggle import Toggle
 
-print(result)
+pygame.init()
+win = pygame.display.set_mode((1000, 600))
 
-print((1, 2) + tuple('r'))
-# import board
-#
-# b = board.Board()
-# b.new_game(1)
-# b.board = []
-# b.fen_to_board("K5/qq4/6/6/k5/6 b - - 0 1", 1)
-# b.board_fen = "K5/qq4/6/6/k5/6 b - - 0 1"
-#
-# print(b.check_end_game())
+toggle = Toggle(win, 100, 100, 100, 40)
+
+run = True
+while run:
+    events = pygame.event.get()
+    for event in events:
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            run = False
+            quit()
+
+    win.fill((255, 255, 255))
+
+    pygame_widgets.update(events)
+    pygame.display.update()
+
