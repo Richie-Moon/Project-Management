@@ -8,6 +8,7 @@ from piece import Piece, Queen
 LEN_SQUARE = 2
 PROMOTION_LENGTH = 5
 
+
 def reverse_items(items: list[str]) -> list[str]:
     """
     Returns the given list with every item reversed.

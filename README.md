@@ -3,6 +3,7 @@ Los Alamos Chess Variant
 
 # Notes
 Only works/only tested on Windows. (Probably) will not word on other OS's. 
+Only run through IDLE, not VSCode. 
 
 # Credits
 [Fairy Stockfish](https://github.com/fairy-stockfish/Fairy-Stockfish)

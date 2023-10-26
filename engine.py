@@ -1,6 +1,7 @@
 import subprocess
 import threading
 from typing import Generator, Any
+import os
 
 # https://github.com/fairy-stockfish/FairyFishGUI/blob/main/fairyfishgui.py
 # Note: Engine knows which side to calculate for using FEN.
@@ -10,7 +11,9 @@ BEST_MOVE_POS = 1
 
 class Engine:
     def __init__(self, path: list) -> None:
-        self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
+
+        self.process = subprocess.Popen(path,
+                                        stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE,
                                         universal_newlines=True)
         self.lock = threading.Lock()
