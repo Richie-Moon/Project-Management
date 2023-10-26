@@ -36,6 +36,7 @@ MENU_TEXT_SIZE: int = 50
 NUM_FILES = 6
 NUM_RANKS = 6
 NUM_SQUARES = 36
+MOVE_LEN = 2
 
 board = board.Board()
 
@@ -508,10 +509,15 @@ def play() -> None:
                                 valid_moves = piece.valid_moves(board)
                                 print(valid_moves)
                                 for location in valid_moves:
-                                    squares[
-                                        coords_to_index(location)].dot = True
+                                    squares[coords_to_index
+                                            (location[:MOVE_LEN])].dot = True
 
                         if square.dot:
+                            # Check for promotion
+                            if selected_piece.letter.lower() == 'p' and \
+                                    selected_piece.rank == 5:
+                                print('promote')
+
                             # move selected piece to dot.
                             captured = board.move((selected_piece.file,
                                                    selected_piece.rank),
@@ -527,14 +533,13 @@ def play() -> None:
 
                             square.has_piece = True
                             squares[coords_to_index((selected_piece.file,
-                                                     selected_piece.rank))].\
+                                                     selected_piece.rank))]. \
                                 has_piece = False
+
                             selected_piece.file = square.file
                             selected_piece.rank = square.rank
                             selected_piece.update()
 
                             reset_squares()
-
-
 
         pygame.display.update()

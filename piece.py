@@ -1,6 +1,8 @@
 import pygame
 import pyffish
+
 END = 2
+FULL_MOVE_LEN = 4
 
 
 class Piece:
@@ -81,9 +83,12 @@ class Piece:
             else:
                 square = move
 
-            if square in valid_moves:
-                moves_to_return.append(moves[i])
-        return moves_to_return
+            for item in valid_moves:
+                if square == item[0:FULL_MOVE_LEN]:
+                    moves_to_return.append(moves[i])
+
+        # Set to remove duplicates from promotions.
+        return list(set(moves_to_return))
 
     # def print_info(self):
     #     print(self.file)

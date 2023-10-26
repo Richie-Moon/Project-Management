@@ -71,7 +71,7 @@ class Engine:
 
     def response(self, phrase: str):
         for line in self.read():
-            print(line)
+            # print(line)
             if phrase in line:
                 return line
 

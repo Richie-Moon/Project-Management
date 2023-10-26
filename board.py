@@ -3,8 +3,10 @@ import piece
 from typing import Type
 import engine
 import pygame
-from piece import Piece
+from piece import Piece, Queen
 
+LEN_SQUARE = 2
+PROMOTION_LENGTH = 5
 
 def reverse_items(items: list[str]) -> list[str]:
     """
@@ -17,9 +19,6 @@ def reverse_items(items: list[str]) -> list[str]:
         reversed_items.append(item[::-1])
 
     return reversed_items
-
-
-LEN_SQUARE = 2
 
 
 class Board:
@@ -49,12 +48,17 @@ class Board:
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
         self.engine.new_game()
 
+        # Temp value, will get changed when new_game() is run.
+        self.w = -1
+
     def new_game(self, w: int) -> None:
         # Reset instance variables.
         self.board = []
         self.moves = []
 
-        self.fen_to_board(self.START_FEN, w)
+        self.w = w
+
+        self.fen_to_board(self.START_FEN)
         self.engine.new_game()
 
         if self.user_side == 0:
@@ -62,12 +66,10 @@ class Board:
         else:
             self.turn = False
 
-    def fen_to_board(self, fen: str, w: int) -> None:
+    def fen_to_board(self, fen: str) -> None:
         """
         Sets the internal board to the position described in the FEN string.
         :param fen: The FEN string position to set the board to.
-        :param w: The width of the square. Passed into the Piece classes,
-         not used in this function.
         :return:
         """
         # Split the extra info off from the end of the fen
@@ -95,16 +97,18 @@ class Board:
                     img = pygame.image.load(f"{path}{item}.svg")
                     rank_list.append(self.LETTER_TO_PIECE
                                      [item.lower()]
-                                     (item, len(rank_list), i, img, w))
+                                     (item, len(rank_list), i, img, self.w))
 
             self.board.append(rank_list)
 
-    def move(self, start: tuple[int, int], end: tuple[int, int]) -> \
-            Type[Piece] | None:
+    def move(self, start: tuple[int, int], end: tuple[int, int],
+             engine_promote: str | None = None) -> Type[Piece] | None:
         """
 
         :param start: The co-ordinates of the piece to move.
         :param end: The co-ordinates of where the piece should move to.
+        :param engine_promote: Whether the engine move is a promotion. If it
+         is, the letter of the promoted piece is sent. Else should be None.
         :return: The captured Piece, if there was one. None, if there wasn't
         """
 
@@ -114,16 +118,51 @@ class Board:
         piece = self.board[s_rank][s_file]
         captured = self.board[e_rank][e_file]
 
-        self.board[s_rank][s_file], self.board[e_rank][e_file] = None, piece
+        # Check for promotion
+        if (self.turn and s_rank == 4 and piece.letter.lower() == 'p') \
+                or engine_promote:
+
+            promote = True
+            is_white = not bool(self.user_side)
+
+            if engine_promote:
+                letter = engine_promote
+                if is_white:
+                    side = "black"
+                else:
+                    side = "white"
+
+            elif is_white:
+                letter = 'Q'
+                side = "white"
+            else:
+                letter = 'q'
+                side = "black"
+
+            img = pygame.image.load(f"assets/pieces/{side}/{letter}.svg")
+
+            self.board[s_rank][s_file], self.board[e_rank][e_file] = None, \
+                self.LETTER_TO_PIECE[letter.lower()](
+                    letter, e_file, e_rank, img, self.w)
+
+        else:
+            promote = False
+            self.board[s_rank][s_file], self.board[e_rank][
+                e_file] = None, piece
 
         if self.turn:
             start_square = self.coords_to_square(s_file, s_rank)
             end_square = self.coords_to_square(e_file, e_rank)
             if self.user_side == 1:
-                self.moves.append(self.switch_side_square(start_square) +
-                                  self.switch_side_square(end_square))
+                move = self.switch_side_square(start_square) + \
+                       self.switch_side_square(end_square)
             else:
-                self.moves.append(start_square + end_square)
+                move = start_square + end_square
+
+            if promote:
+                move += 'q'
+
+            self.moves.append(move)
 
         self.board_fen = pyffish.get_fen(self.VARIANT, self.START_FEN,
                                          self.moves)
@@ -134,7 +173,12 @@ class Board:
 
     def engine_move(self) -> None:
         best_move = self.engine.get_move()
-        # This won't work for promotions. Add len check?
+
+        if len(best_move) == PROMOTION_LENGTH:
+            promo_piece = best_move[-1]
+        else:
+            promo_piece = None
+
         start = best_move[:LEN_SQUARE]  # first 2 chars
         end = best_move[LEN_SQUARE:]  # last 2 chars
 
@@ -143,10 +187,10 @@ class Board:
 
         self.moves.append(start + end)
         if self.user_side == 1:
-            self.move(self.switch_side(start_coords),
-                      self.switch_side(end_coords))
-        else:
-            self.move(start_coords, end_coords)
+            start_coords = self.switch_side(start_coords)
+            end_coords = self.switch_side(end_coords)
+
+        self.move(start_coords, end_coords, promo_piece)
 
     def switch_side(self, move: tuple[int, int]) -> tuple[int, int]:
         """
@@ -220,7 +264,7 @@ class Board:
         :return: Returns a dict with keys `result` and `reason`. `result` is
          an integer, where -1 means draw, 0 means white wins, and 1 means
          black wins. `reason` is the reason for the result (i.e. Checkmate or
-          Draw by insufficient Material).
+         Draw by insufficient Material).
         """
         DRAW = -1
         WHITE_WIN = 0
@@ -236,9 +280,13 @@ class Board:
             return_dict['reason'] = "Draw by Insufficient Material"
             return return_dict
 
+        gives_check = pyffish.gives_check(self.VARIANT, self.START_FEN,
+                                          self.moves)
+        # Stalemate
+        pass
+
         # Checkmate
-        if pyffish.gives_check(self.VARIANT, self.START_FEN, self.moves) \
-                and len(self.board_valid_moves()) == 0:
+        if gives_check and len(self.board_valid_moves()) == 0:
             return_dict['reason'] = 'CHECKMATE'
             is_white = not bool(self.user_side)
 
