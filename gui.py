@@ -6,6 +6,7 @@ from typing import Literal
 import board
 import pygame_widgets
 from pygame_widgets.slider import Slider
+from pygame_widgets.toggle import Toggle
 from game import Square
 import numpy as np
 
@@ -131,12 +132,8 @@ def display_title(line1: str, line2: str,
     title_text_1 = get_font(TITLE_SIZE, style).render(line1, True, WHITE)
     title_text_2 = get_font(TITLE_SIZE, style).render(line2, True, WHITE)
 
-    if line2 == "":
-        title_1_rect = title_text_1.get_rect(center=(w * HALF, h /
-                                                     (TITLE_POSITION * HALF)))
-    else:
-        title_1_rect = title_text_1.get_rect(center=(w * HALF, h /
-                                                     TITLE_POSITION))
+    title_1_rect = title_text_1.get_rect(center=(w * HALF, h /
+                                                 TITLE_POSITION))
     title_2_rect = title_text_2.get_rect(center=(w * HALF,
                                                  h / TITLE_POSITION +
                                                  TITLE_SIZE))
@@ -267,7 +264,7 @@ def settings(from_play: bool) -> None:
         white_image.get_height() // 8, white_image.get_width() // 8))
 
     side_white = ImageButton(pos=(w * HALF - side_white_image.get_width()
-                                  * HALF, h * HALF - BUTTON_GAP),
+                                  * HALF, h * HALF - BUTTON_GAP * DOUBLE),
                              text_input="",
                              font=get_font(BUTTON_TEXT_SIZE),
                              base_colour=BLACK,
@@ -282,7 +279,7 @@ def settings(from_play: bool) -> None:
         black_image.get_height() // 8, black_image.get_width() // 8))
 
     side_black = ImageButton(pos=(w * HALF + side_black_rect.height * HALF,
-                                  h * HALF - BUTTON_GAP),
+                                  h * HALF - BUTTON_GAP * DOUBLE),
                              text_input="",
                              font=get_font(BUTTON_TEXT_SIZE),
                              base_colour=BLACK,
@@ -308,6 +305,24 @@ def settings(from_play: bool) -> None:
                     int(h * HALF + BUTTON_GAP * SLIDER_POS), SLIDER_LENGTH,
                     SLIDER_WIDTH, min=SLIDER_MIN, max=SLIDER_MAX, step=STEP,
                     initial=board.engine.elo, handleColour=DARK_GRAY)
+
+    # Toggle Settings
+    TOGGLE_WIDTH = 60
+    TOGGLE_HEIGHT = 25
+    TOGGLE_X_ADJUST = 3
+    TOGGLE_Y_ADJUST = 15
+
+    # Colourblind setting
+    colourblind_text = get_font(MENU_TEXT_SIZE).render("Colourblind Mode",
+                                                       True, WHITE)
+
+    colourblind_rect = colourblind_text.get_rect(
+        center=(w * HALF - TOGGLE_WIDTH * 1, side_black.y_pos -
+                BUTTON_GAP * DOUBLE * DOUBLE))
+
+    toggle = Toggle(screen, int(w * HALF + TOGGLE_WIDTH * TOGGLE_X_ADJUST),
+                    colourblind_rect.top + TOGGLE_Y_ADJUST, TOGGLE_WIDTH,
+                    TOGGLE_HEIGHT)
 
     while True:
         screen.fill(BLACK)
@@ -336,7 +351,7 @@ def settings(from_play: bool) -> None:
 
         # Side selection setting
         side_select_text = get_font(MENU_TEXT_SIZE).render("Side Select",
-                                                           True, 'white')
+                                                           True, WHITE)
         side_select_rect = side_select_text.get_rect(center=(w * HALF,
                                                              side_white.y_pos
                                                              - BUTTON_GAP *
@@ -344,7 +359,7 @@ def settings(from_play: bool) -> None:
 
         # Engine Difficulty Setting
         difficulty_text = get_font(MENU_TEXT_SIZE).render("Engine Difficulty",
-                                                          True, 'white')
+                                                          True, WHITE)
         difficulty_text_rect = difficulty_text.get_rect(center=(w * HALF,
                                                                 slider.get('y')
                                                                 - BUTTON_GAP))
@@ -354,6 +369,7 @@ def settings(from_play: bool) -> None:
                                                               slider.get('y') +
                                                               BUTTON_GAP *
                                                               DOUBLE))
+
         for event in pygame.event.get():
             pygame_widgets.update(event)
 
@@ -382,7 +398,8 @@ def settings(from_play: bool) -> None:
                         is True:
                     board.engine.change_elo(slider.getValue())
                     slider.hide()
-                    play()
+                    toggle.hide()
+                    play(toggle.getValue())
                     return
 
                 # Done button pressed
@@ -390,12 +407,15 @@ def settings(from_play: bool) -> None:
                         is True:
                     board.engine.change_elo(slider.getValue())
                     slider.hide()
+                    toggle.hide()
                     return
 
             screen.blit(side_select_text, side_select_rect)
 
             screen.blit(slider_value_text, slider_text_rect)
             screen.blit(difficulty_text, difficulty_text_rect)
+
+            screen.blit(colourblind_text, colourblind_rect)
 
             # Has to be indented so that the slider draws first
             # (otherwise causes flickering)
@@ -434,7 +454,7 @@ def tutorial():
         pygame.display.update()
 
 
-def play() -> None:
+def play(cb_mode: bool) -> None:
     """
     The current game board.
     """
@@ -470,7 +490,7 @@ def play() -> None:
                 light = False
 
             sq = Square((j * square_width, i * square_width), light,
-                        square_width, j, NUM_RANKS - 1 - i)
+                        square_width, j, NUM_RANKS - 1 - i, cb_mode)
 
             sq.draw(screen)
             squares.append(sq)
@@ -530,7 +550,7 @@ def play() -> None:
                                 print(valid_moves)
                                 for location in valid_moves:
                                     squares[coords_to_index
-                                    (location[:MOVE_LEN])].dot = True
+                                            (location[:MOVE_LEN])].dot = True
 
                         if square.dot:
                             # Check for promotion

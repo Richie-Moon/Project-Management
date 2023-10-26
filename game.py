@@ -2,7 +2,9 @@ import pygame
 
 LIGHT = (207, 177, 129)
 DARK = (129, 92, 60)
-GRAY = (211, 211, 211, 160)
+DOT_GRAY = (211, 211, 211, 160)
+DARK_GRAY = (69, 69, 69)
+LIGHT_GRAY = (150, 150, 150)
 
 HALF = 0.5
 CIRCLE_RADIUS = 5
@@ -10,7 +12,7 @@ CIRCLE_RADIUS = 5
 
 class Square:
     def __init__(self, pos: tuple[int, int], light: bool, w: int, file: int,
-                 rank: int):
+                 rank: int, cb_colours: bool):
         """
 
         :param pos: x and y co-ordinates for the top-left corner of square.
@@ -23,6 +25,7 @@ class Square:
         self.y_pos = pos[1]
         self.light: bool = light
         self.w = w
+        self.cb_colours = cb_colours
 
         self.dot: bool = False
 
@@ -39,16 +42,22 @@ class Square:
         self.dot_surface = pygame.Surface((w, w), pygame.SRCALPHA)
 
     def draw(self, screen: pygame.Surface, image: pygame.Surface = None):
-        if self.light:
-            pygame.draw.rect(screen, LIGHT, self.rect)
-        if not self.light:
-            pygame.draw.rect(screen, DARK, self.rect)
+        if not self.cb_colours:
+            if self.light:
+                pygame.draw.rect(screen, LIGHT, self.rect)
+            if not self.light:
+                pygame.draw.rect(screen, DARK, self.rect)
+        else:
+            if self.light:
+                pygame.draw.rect(screen, LIGHT_GRAY, self.rect)
+            if not self.light:
+                pygame.draw.rect(screen, DARK_GRAY, self.rect)
 
         if self.has_piece:
             screen.blit(image, self.rect)
 
         if self.dot:
-            pygame.draw.circle(self.dot_surface, GRAY,
+            pygame.draw.circle(self.dot_surface, DOT_GRAY,
                                (self.dot_surface.get_width() * HALF,
                                 self.dot_surface.get_width() * HALF),
                                self.w // CIRCLE_RADIUS)
