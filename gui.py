@@ -429,6 +429,7 @@ def tutorial():
     """
 
     pygame.display.set_caption("Tutorial")
+    path = "assets/pieces/white/"
 
     while True:
         screen.fill(BLACK)
@@ -439,10 +440,110 @@ def tutorial():
         back_button.update(screen)
         back_button.change_colour(mouse_pos)
 
+        img_size = 70
+
         title_size = 100
         title = get_font(title_size, "Medium").render("TUTORIAL", True, WHITE)
         title_rect = title.get_rect(center=(w * HALF, h / TITLE_POSITION))
         screen.blit(title, title_rect)
+
+        intro = get_font(MENU_TEXT_SIZE).render(
+            "Los Alamos Chess is a chess variant played on a 6x6 board "
+            "without bishops.", True, WHITE)
+        intro_rect = intro.get_rect(center=(w * HALF, title_rect.bottom))
+        screen.blit(intro, intro_rect)
+
+        goal = get_font(MENU_TEXT_SIZE).render(
+            "The goal of the game is to checkmate the opponent's king.",
+            True, WHITE)
+        TXT_ADJUST = 15
+        LINE_BREAK = 40
+        goal_rect = goal.get_rect(center=(w * HALF, intro_rect.bottom +
+                                          TXT_ADJUST))
+        screen.blit(goal, goal_rect)
+
+        pawn_img = scale_image(pygame.image.load(f"{path}P.svg"),
+                               (img_size, img_size))
+        pawn_img_rect = pawn_img[1]
+        pawn = get_font(MENU_TEXT_SIZE).render(
+            "Pawns are the most basic piece.", True, WHITE)
+        pawn_rect = pawn.get_rect(center=(w * HALF, goal_rect.bottom +
+                                          TXT_ADJUST + LINE_BREAK))
+        pawn2 = get_font(MENU_TEXT_SIZE).render(
+            "They can move 1 square up, and can capture enemy pieces "
+            "diagonally.", True, WHITE)
+        pawn2_rect = pawn2.get_rect(center=(w * HALF, pawn_rect.bottom +
+                                            TXT_ADJUST))
+        pawn_img_rect.center = (pawn_rect.left - img_size * HALF, pawn_rect.y
+                                + TXT_ADJUST)
+        screen.blit(pawn_img[0], pawn_img_rect)
+        screen.blit(pawn, pawn_rect)
+        screen.blit(pawn2, pawn2_rect)
+
+        rook_img = scale_image(pygame.image.load(f"{path}R.svg"),
+                               (img_size, img_size))
+        rook_img_rect = rook_img[1]
+        rook = get_font(MENU_TEXT_SIZE).render(
+            "The rook can move vertically and horizontally for any number of "
+            "squares.", True, WHITE)
+        rook_rect = rook.get_rect(center=(w * HALF, pawn2_rect.bottom +
+                                          TXT_ADJUST + LINE_BREAK))
+        rook_img_rect.center = (rook_rect.left - img_size * HALF,
+                                rook_rect.y + TXT_ADJUST)
+        screen.blit(rook, rook_rect)
+        screen.blit(rook_img[0], rook_img_rect)
+
+        knight = get_font(MENU_TEXT_SIZE).render(
+            "The knight moves 2 squares in one direction, and 1 square in "
+            "another, like an 'L'.", True, WHITE)
+        knight_rect = knight.get_rect(center=(w * HALF, rook_rect.bottom +
+                                              TXT_ADJUST + LINE_BREAK))
+        knight_img = scale_image(pygame.image.load(f"{path}N.svg"),
+                                 (img_size, img_size))
+        knight_img_rect = knight_img[1]
+        knight_img_rect.center = (knight_rect.left - img_size * HALF,
+                                  knight_rect.y + TXT_ADJUST)
+        knight2 = get_font(MENU_TEXT_SIZE).render("They can jump over other "
+                                                  "pieces.", True, WHITE)
+        knight2_rect = knight2.get_rect(center=(w * HALF, knight_rect.bottom +
+                                                TXT_ADJUST))
+        screen.blit(knight_img[0], knight_img_rect)
+        screen.blit(knight, knight_rect)
+        screen.blit(knight2, knight2_rect)
+
+        queen = get_font(MENU_TEXT_SIZE).render(
+            "The queen can move horizontally, vertically, and diagonally.",
+            True, WHITE)
+        queen_img = scale_image(pygame.image.load(f"{path}Q.svg"),
+                                (img_size, img_size))
+        queen_img_rect = queen_img[1]
+        queen_rect = queen.get_rect(center=(w * HALF, knight2_rect.bottom +
+                                            TXT_ADJUST + LINE_BREAK))
+        queen_img_rect.center = (queen_rect.left - img_size * HALF,
+                                 queen_rect.y + TXT_ADJUST)
+        screen.blit(queen_img[0], queen_img_rect)
+        screen.blit(queen, queen_rect)
+
+        king = get_font(MENU_TEXT_SIZE).render(
+            "The king is the most important piece. It can move 1 square in any"
+            " direction. ", True, WHITE)
+        king_rect = king.get_rect(center=(w * HALF, queen_rect.bottom
+                                          + TXT_ADJUST + LINE_BREAK))
+        king_img = scale_image(pygame.image.load(f"{path}K.svg"),
+                               (img_size, img_size))
+        king_img_rect = king_img[1]
+        king_img_rect.center = (king_rect.left - img_size * HALF,
+                                king_rect.y + TXT_ADJUST)
+
+        screen.blit(king_img[0], king_img_rect)
+        screen.blit(king, king_rect)
+
+        promo = get_font(MENU_TEXT_SIZE).render(
+            "If a pawn reaches the other end of the board, it will "
+            "promote to a more powerful piece", True, WHITE)
+        promo_rect = promo.get_rect(center=(w * HALF, king_rect.bottom +
+                                            TXT_ADJUST + LINE_BREAK))
+        screen.blit(promo, promo_rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
