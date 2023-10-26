@@ -60,15 +60,11 @@ class Piece:
         valid_moves = pyffish.legal_moves(board.VARIANT, board.START_FEN,
                                           board.moves)
 
-        print(valid_moves)
-
         moves_square = []
 
         for i in range(len(moves)):
             moves_square.append(board.coords_to_square(self.file, self.rank)
                                 + board.coords_to_square(*moves[i]))
-
-        print(moves_square)
 
         moves_to_return = []
 

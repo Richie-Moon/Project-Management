@@ -186,7 +186,7 @@ class Board:
         start_coords = self.square_to_coords(start)
         end_coords = self.square_to_coords(end)
 
-        self.moves.append(start + end)
+        self.moves.append(best_move)
         if self.user_side == 1:
             start_coords = self.switch_side(start_coords)
             end_coords = self.switch_side(end_coords)
@@ -284,7 +284,10 @@ class Board:
         gives_check = pyffish.gives_check(self.VARIANT, self.START_FEN,
                                           self.moves)
         # Stalemate
-        pass
+        if len(self.board_valid_moves()) == 0 and not gives_check:
+            return_dict["result"] = DRAW
+            return_dict["reason"] = "Draw by Stalemate"
+            return return_dict
 
         # Checkmate
         if gives_check and len(self.board_valid_moves()) == 0:

@@ -121,18 +121,22 @@ def coords_to_index(coords: tuple[int, int]) -> int:
     return array[formatted]
 
 
-def display_title() -> None:
+def display_title(line1: str, line2: str,
+                  style: Literal["Bold", "Medium", "Regular", "SemiBold"]) \
+        -> None:
     """
     Displays the title to the main menu.
     """
 
-    title_text_1 = get_font(TITLE_SIZE, "Bold").render("MINI", True,
-                                                       "white")
-    title_text_2 = get_font(TITLE_SIZE, "Bold").render(
-        "CHESS", True, "white")
+    title_text_1 = get_font(TITLE_SIZE, style).render(line1, True, WHITE)
+    title_text_2 = get_font(TITLE_SIZE, style).render(line2, True, WHITE)
 
-    title_1_rect = title_text_1.get_rect(center=(w * HALF, h /
-                                                 TITLE_POSITION))
+    if line2 == "":
+        title_1_rect = title_text_1.get_rect(center=(w * HALF, h /
+                                                     (TITLE_POSITION * HALF)))
+    else:
+        title_1_rect = title_text_1.get_rect(center=(w * HALF, h /
+                                                     TITLE_POSITION))
     title_2_rect = title_text_2.get_rect(center=(w * HALF,
                                                  h / TITLE_POSITION +
                                                  TITLE_SIZE))
@@ -205,7 +209,7 @@ def main_menu() -> None:
         mouse_pos = pygame.mouse.get_pos()
         screen.blit(bg_scaled, rect)
 
-        display_title()
+        display_title("MINI", "CHESS", "Bold")
 
         play_button.change_colour(mouse_pos)
         play_button.update(screen)
@@ -231,7 +235,6 @@ def main_menu() -> None:
 
 
 def settings(from_play: bool) -> None:
-    screen.fill(BLACK)
     pygame.display.set_caption("Settings")
 
     if from_play:
@@ -307,7 +310,11 @@ def settings(from_play: bool) -> None:
                     initial=board.engine.elo, handleColour=DARK_GRAY)
 
     while True:
+        screen.fill(BLACK)
+
         screen.blit(blurred_bg_scaled, blurred_bg_rect)
+
+        display_title("SETTINGS", "", "Medium")
 
         mouse_pos = pygame.mouse.get_pos()
 
@@ -400,16 +407,29 @@ def tutorial():
     The tutorial screen. Tells the user how each of the pieces move, how
     promotion works, as well as the rules of chess.
     """
-    screen.fill(BLACK)
-    screen.blit(blurred_bg_scaled, blurred_bg_rect)
+
     pygame.display.set_caption("Tutorial")
 
     while True:
+        screen.fill(BLACK)
+        screen.blit(blurred_bg_scaled, blurred_bg_rect)
+
         mouse_pos = pygame.mouse.get_pos()
+
+        back_button.update(screen)
+        back_button.change_colour(mouse_pos)
+
+        title_size = 100
+        title = get_font(title_size, "Medium").render("TUTORIAL", True, WHITE)
+        title_rect = title.get_rect(center=(w * HALF, h / TITLE_POSITION))
+        screen.blit(title, title_rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if back_button.check_position(mouse_pos):
+                    return
 
         pygame.display.update()
 
@@ -510,7 +530,7 @@ def play() -> None:
                                 print(valid_moves)
                                 for location in valid_moves:
                                     squares[coords_to_index
-                                            (location[:MOVE_LEN])].dot = True
+                                    (location[:MOVE_LEN])].dot = True
 
                         if square.dot:
                             # Check for promotion
