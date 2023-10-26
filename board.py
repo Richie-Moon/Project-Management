@@ -43,7 +43,7 @@ class Board:
         self.MAX_RANK = 6
 
         # 0 = white, 1 = black
-        self.user_side: int = 0  # Could try other ways if int not good
+        self.user_side: int = 0
         self.turn = True
 
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
