@@ -568,6 +568,10 @@ def play(cb_mode: bool) -> None:
         for sq in squares:
             sq.dot = False
 
+    def reset_shade():
+        for sq in squares:
+            sq.shade = False
+
     screen.fill(BLACK)
 
     pygame.display.set_caption("Play")
@@ -595,12 +599,13 @@ def play(cb_mode: bool) -> None:
                 light = False
 
             sq = Square((j * square_width, i * square_width), light,
-                        square_width, j, NUM_RANKS - 1 - i, cb_mode)
+                        square_width, j, NUM_RANKS - 1 - i, cb_mode, False)
 
             sq.draw(screen)
             squares.append(sq)
 
     selected_piece = None
+    selected_square = None
     user_captured = []
     engine_captured = []
 
@@ -620,12 +625,16 @@ def play(cb_mode: bool) -> None:
         pygame.display.update()
 
         if board.check_end_game() is not None:
+            # TODO Endgame
             return
 
         if board.turn is False:
             # Change to opponents turn
             # pygame.display.update()
-            board.engine_move()
+            start, end = board.engine_move()
+            reset_shade()
+            squares[coords_to_index(start)].shade = True
+            squares[coords_to_index(end)].shade = True
             continue
 
         # # Show square coords for testing.
@@ -651,22 +660,20 @@ def play(cb_mode: bool) -> None:
                                     board.user_side):
                                 reset_squares()
                                 selected_piece = piece
+                                selected_square = square
                                 valid_moves = piece.valid_moves(board)
-                                print(valid_moves)
                                 for location in valid_moves:
                                     squares[coords_to_index
                                             (location[:MOVE_LEN])].dot = True
 
                         if square.dot:
-                            # Check for promotion
-                            if selected_piece.letter.lower() == 'p' and \
-                                    selected_piece.rank == 5:
-                                print('promote')
-
                             # move selected piece to dot.
                             captured = board.move((selected_piece.file,
                                                    selected_piece.rank),
                                                   (square.file, square.rank))
+                            reset_shade()
+                            square.shade = True
+                            selected_square.shade = True
                             if captured is not None:
                                 # will be True if user playing white, False if
                                 # user playing black.

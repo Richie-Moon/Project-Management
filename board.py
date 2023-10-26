@@ -173,7 +173,7 @@ class Board:
         self.turn = not self.turn
         return captured
 
-    def engine_move(self) -> None:
+    def engine_move(self) -> tuple[tuple[int, int], tuple[int, int]]:
         best_move = self.engine.get_move()
 
         if len(best_move) == PROMOTION_LENGTH:
@@ -193,6 +193,7 @@ class Board:
             end_coords = self.switch_side(end_coords)
 
         self.move(start_coords, end_coords, promo_piece)
+        return start_coords, end_coords
 
     def switch_side(self, move: tuple[int, int]) -> tuple[int, int]:
         """

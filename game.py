@@ -5,6 +5,7 @@ DARK = (129, 92, 60)
 DOT_GRAY = (211, 211, 211, 160)
 DARK_GRAY = (69, 69, 69)
 LIGHT_GRAY = (130, 130, 130)
+SHADE = (255, 255, 255, 70)
 
 HALF = 0.5
 CIRCLE_RADIUS = 5
@@ -12,7 +13,7 @@ CIRCLE_RADIUS = 5
 
 class Square:
     def __init__(self, pos: tuple[int, int], light: bool, w: int, file: int,
-                 rank: int, cb_colours: bool):
+                 rank: int, cb_colours: bool, shade: bool):
         """
 
         :param pos: x and y co-ordinates for the top-left corner of square.
@@ -28,6 +29,7 @@ class Square:
         self.cb_colours = cb_colours
 
         self.dot: bool = False
+        self.shade = shade
 
         self.file = file
         self.rank = rank
@@ -40,6 +42,8 @@ class Square:
 
         # Surface for dot (required for transparency).
         self.dot_surface = pygame.Surface((w, w), pygame.SRCALPHA)
+        self.shade_surface = pygame.Surface((w, w), pygame.SRCALPHA)
+        self.shade_surface.fill(SHADE)
 
     def draw(self, screen: pygame.Surface, image: pygame.Surface = None):
         if not self.cb_colours:
@@ -52,6 +56,9 @@ class Square:
                 pygame.draw.rect(screen, LIGHT_GRAY, self.rect)
             if not self.light:
                 pygame.draw.rect(screen, DARK_GRAY, self.rect)
+
+        if self.shade:
+            screen.blit(self.shade_surface, self.rect)
 
         if self.has_piece:
             screen.blit(image, self.rect)
