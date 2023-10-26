@@ -126,11 +126,12 @@ class Board:
             is_white = not bool(self.user_side)
 
             if engine_promote:
-                letter = engine_promote
                 if is_white:
                     side = "black"
+                    letter = engine_promote.lower()
                 else:
                     side = "white"
+                    letter = engine_promote.upper()
 
             elif is_white:
                 letter = 'Q'
