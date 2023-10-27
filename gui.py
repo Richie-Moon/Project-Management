@@ -622,6 +622,23 @@ def play(cb_mode: bool) -> None:
                 square.has_piece = False
                 square.draw(screen)
 
+        if board.turn:
+            side_text = get_font(MENU_TEXT_SIZE).render("Your", True, WHITE)
+
+        else:
+            side_text = get_font(MENU_TEXT_SIZE).render("Opponent", True, WHITE)
+
+        side_rect = side_text.get_rect(left=board_rect.right + BUTTON_GAP,
+                                       top=BUTTON_GAP)
+
+        turn_text = get_font(MENU_TEXT_SIZE).render("Turn", True, WHITE)
+        TXT_ADJUST = 10
+        turn_rect = turn_text.get_rect(centerx=side_rect.centerx,
+                                       top=side_rect.bottom - TXT_ADJUST)
+
+        screen.blit(side_text, side_rect)
+        screen.blit(turn_text, turn_rect)
+
         pygame.display.update()
 
         if board.check_end_game() is not None:
@@ -629,8 +646,6 @@ def play(cb_mode: bool) -> None:
             return
 
         if board.turn is False:
-            # Change to opponents turn
-            # pygame.display.update()
             start, end = board.engine_move()
             reset_shade()
             squares[coords_to_index(start)].shade = True
