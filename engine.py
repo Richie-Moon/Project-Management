@@ -11,6 +11,10 @@ BEST_MOVE_POS = 1
 
 class Engine:
     def __init__(self, path: list) -> None:
+        """
+        Initialise the engine.
+        :param path: The path to the .exe file of the engine.
+        """
 
         self.process = subprocess.Popen(path,
                                         stdin=subprocess.PIPE,
@@ -32,18 +36,30 @@ class Engine:
         self.change_elo(self.DEFAULT_ELO)
 
     def write(self, message: str) -> None:
+        """
+        Write a command to the engine.
+        :param message: The command to send.
+        :return:
+        """
         with self.lock:
             self.process.stdin.write(message)
             self.process.stdin.flush()
 
     def read(self) -> Generator[str, Any, None]:
+        """
+        Reads responses from the engine. This function should not be used, as
+        it is a generator, it will continue to respond with lines from the
+        engine. Instead, use response().
+        :return: Will continue to output lines from the engine.
+        """
         while self.process.poll() is None:
             yield self.process.stdout.readline()
 
     def new_game(self) -> None:
         """
         Starts a new game. Initialises the engine: sets variant to losalamos,
-        sets the position to the startpos and sets engine elo to default.
+        sets the position to the starting position and sets engine elo to
+        default.
         """
 
         self.write("ucinewgame\n")
@@ -52,6 +68,10 @@ class Engine:
         self.write(f"position startpos\n")
 
     def is_ready(self) -> bool:
+        """
+        Sends the isready command to the engine.
+        :return: Returns True if the engine is ready. Returns False otherwise.
+        """
         self.write("isready\n")
         if self.response("readyok"):
             return True
@@ -73,6 +93,12 @@ class Engine:
     #     return line.split(" ", 1)[1]
 
     def response(self, phrase: str):
+        """
+        Returns a specific line from the engine if it contains the phrase
+        given.
+        :param phrase: The phrase to search for, and return.
+        :return:
+        """
         for line in self.read():
             # print(line)
             if phrase in line:
@@ -80,10 +106,11 @@ class Engine:
 
     def update(self, fen: str) -> None:
         """
+        Update the engines internal board.
         :param fen: The FEN string of the current position.
         """
         self.write(f"position fen {fen}")
-        # Need this here to work??? IDK why.
+        # Need this here to work??? IDK why but the engine freezes without it.
         self.write('d\n')
 
     def get_move(self) -> str:

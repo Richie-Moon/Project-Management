@@ -1,6 +1,5 @@
 import datetime
 import os
-
 import pygame
 import sys
 import ctypes
@@ -30,6 +29,7 @@ BUTTON_BASE_COLOUR: tuple[int, int, int] = (0, 0, 0)
 BUTTON_HOVER_COLOUR: tuple[int, int, int] = (255, 255, 255)
 DARK_GRAY = (16, 16, 16)
 
+# Buttons
 BUTTON_GAP: int = 40
 HALF: float = 0.5
 DOUBLE: int = 2
@@ -38,6 +38,7 @@ MENU_BUTTON_WIDTH: int = 530
 MENU_BUTTON_HEIGHT: int = 150
 MENU_TEXT_SIZE: int = 50
 
+# Back Button
 BACK_POS = (150, 100)
 BACK_WIDTH = 250
 BACK_HEIGHT = 100
@@ -104,7 +105,7 @@ def is_even(num: int) -> bool:
     """
     Returns True if `num` is even, False if it's odd.
     :param num: Number to check.
-    :return:
+    :return: Returns True if the number is even, False if not.
     """
     if num % 2 == 0:
         return True
@@ -135,7 +136,7 @@ def display_title(line1: str, line2: str,
                   style: Literal["Bold", "Medium", "Regular", "SemiBold"]) \
         -> None:
     """
-    Displays the title to the main menu.
+    Displays the title to the menu screens.
     """
 
     title_text_1 = get_font(TITLE_SIZE, style).render(line1, True, WHITE)
@@ -209,6 +210,7 @@ def main_menu() -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
+    # Game loop
     while True:
         pygame.display.set_caption("Mini Chess")
 
@@ -217,6 +219,7 @@ def main_menu() -> None:
 
         display_title("MINI", "CHESS", "Bold")
 
+        # Update all the buttons.
         play_button.change_colour(mouse_pos)
         play_button.update(screen)
 
@@ -242,8 +245,14 @@ def main_menu() -> None:
 
 
 def settings(from_play: bool) -> None:
+    """
+    The settings menu.
+    :param from_play: Whether to run the play function afterward.
+    :return:
+    """
     pygame.display.set_caption("Settings")
 
+    # The finish button should either have 'Play' or 'Done'.
     if from_play:
         play_button = Button(pos=(w * HALF, h * HALF + HEIGHT * DOUBLE +
                                   BUTTON_GAP),
@@ -269,6 +278,7 @@ def settings(from_play: bool) -> None:
                              height=MENU_BUTTON_HEIGHT,
                              transparent=True)
 
+    # Side selection
     IMAGE_SIZE = 8
     white_image = pygame.image.load("assets/pieces/white/K.svg")
     side_white_image, side_white_rect = scale_image(white_image, (
@@ -434,7 +444,6 @@ def settings(from_play: bool) -> None:
             pygame.display.update()
 
 
-
 def tutorial():
     """
     The tutorial screen. Tells the user how each of the pieces move, how
@@ -456,11 +465,13 @@ def tutorial():
 
         img_size = 70
 
+        # Title
         title_size = 100
         title = get_font(title_size, "Medium").render("TUTORIAL", True, WHITE)
         title_rect = title.get_rect(center=(w * HALF, h / TITLE_POSITION))
         screen.blit(title, title_rect)
 
+        # Introduction to Mini Chess.
         intro = get_font(TUTO_TEXT_SIZE).render(
             "Los Alamos Chess is a chess variant played on a 6x6 board "
             "without bishops.", True, WHITE)
@@ -476,6 +487,7 @@ def tutorial():
                                           TXT_ADJUST))
         screen.blit(goal, goal_rect)
 
+        # Pawn movement
         pawn_img = scale_image(pygame.image.load(f"{path}P.svg"),
                                (img_size, img_size))
         pawn_img_rect = pawn_img[1]
@@ -494,6 +506,7 @@ def tutorial():
         screen.blit(pawn, pawn_rect)
         screen.blit(pawn2, pawn2_rect)
 
+        # Rook movement
         rook_img = scale_image(pygame.image.load(f"{path}R.svg"),
                                (img_size, img_size))
         rook_img_rect = rook_img[1]
@@ -507,6 +520,7 @@ def tutorial():
         screen.blit(rook, rook_rect)
         screen.blit(rook_img[0], rook_img_rect)
 
+        # Knight movement
         knight = get_font(TUTO_TEXT_SIZE).render(
             "The knight moves 2 squares in one direction, and 1 square in "
             "another, like an 'L'.", True, WHITE)
@@ -525,6 +539,7 @@ def tutorial():
         screen.blit(knight, knight_rect)
         screen.blit(knight2, knight2_rect)
 
+        # Queen movement
         queen = get_font(TUTO_TEXT_SIZE).render(
             "The queen can move horizontally, vertically, and diagonally.",
             True, WHITE)
@@ -538,6 +553,7 @@ def tutorial():
         screen.blit(queen_img[0], queen_img_rect)
         screen.blit(queen, queen_rect)
 
+        # King movement
         king = get_font(TUTO_TEXT_SIZE).render(
             "The king is the most important piece. It can move 1 square in any"
             " direction. ", True, WHITE)
@@ -552,6 +568,7 @@ def tutorial():
         screen.blit(king_img[0], king_img_rect)
         screen.blit(king, king_rect)
 
+        # Promotion information
         promo = get_font(TUTO_TEXT_SIZE).render(
             "If a pawn reaches the other end of the board, it will "
             "promote to a more powerful piece", True, WHITE)
@@ -572,19 +589,35 @@ def tutorial():
 
 def play(cb_mode: bool) -> None:
     """
-    The current game board.
+    Plays the game.
+    :param cb_mode: Whether to draw the board using colourblind mode colours.
     """
 
     def reset_squares():
+        """
+        Removes the dot from all the squares.
+        :return:
+        """
         for sq in squares:
             sq.dot = False
 
     def reset_shade():
+        """
+        Removes the shading from all the squares.
+        :return:
+        """
         for sq in squares:
             sq.shade = False
 
     def save_game(name: str, game_result: int, end_reason: str) -> None:
-        path = "games"
+        """
+        Saves game information and moves to a txt file in the games folder.
+        :param name: The users' name
+        :param game_result: -1 for Draw, 0 for white win, 1 for black win
+        :param end_reason: Details about the result (Checkmate, stalemate, etc)
+        :return:
+        """
+        path = "games/"
         num_games = len(os.listdir(path))
         datetime_now = datetime.datetime.now()
 
@@ -605,7 +638,7 @@ def play(cb_mode: bool) -> None:
         else:
             winner = "Black wins "
 
-        with open(f"{path}/{name}{num_games + 1}.txt", 'x') as file:
+        with open(f"{path}{name}{num_games + 1}.txt", 'x') as file:
             file.write(f"User: {name}\n\n")
             file.write(f"Date: {formatted_date}\n")
             file.write(f"Time: {formatted_time}\n\n")
@@ -629,6 +662,7 @@ def play(cb_mode: bool) -> None:
     square_width: int = board_rect.width // NUM_FILES
     board.new_game(square_width)
 
+    # Check if the engine is ready to receive commands.
     if board.engine.is_ready() is False:
         print("Engine failed to start or is not ready")
         return
@@ -653,6 +687,9 @@ def play(cb_mode: bool) -> None:
 
     selected_piece = None
     selected_square = None
+
+    # Not currently being used. Can be used for showing moves to user during
+    # the game.
     user_captured = []
     engine_captured = []
 
@@ -680,28 +717,27 @@ def play(cb_mode: bool) -> None:
         if game_end is not None:
             result = game_end['result']
             reason = game_end['reason']
-            texts = []
 
             # The user won
             if (result == WHITE_WIN and board.user_side == 0) or \
                     (result == BLACK_WIN and board.user_side == 1):
                 win = "YOU WIN!"
                 col = (124, 252, 0)
+            # Game resulted in a draw
             elif result == DRAW:
                 win = "Draw"
                 col = (130, 130, 130)
+            # User lost
             else:
                 win = "You lose"
                 col = (255, 0, 0)
 
             reason_text = get_font(MENU_TEXT_SIZE).render(reason, True, WHITE)
             reason_rect = reason_text.get_rect(left=LEFT, centery=h * HALF)
-            texts.append(reason_text)
 
             win_text = get_font(TXT_SIZE, "SemiBold").render(win, True, col)
             win_rect = win_text.get_rect(centerx=reason_rect.centerx,
                                          bottom=reason_rect.top)
-            texts.append(win_text)
 
             GRAY = (70, 70, 70)
             LIGHT_GRAY = (140, 140, 140)
@@ -712,13 +748,11 @@ def play(cb_mode: bool) -> None:
                                                           WHITE)
             enter_name_rect = enter_name.get_rect(centerx=reason_rect.centerx,
                                                   top=reason_rect.bottom)
-            texts.append(enter_name)
 
             disclaimer = get_font(SMALL_FONT_SIZE).render(
                 "Do not enter sensitive information", True, WHITE)
             disclaimer_rect = disclaimer.get_rect(centerx=reason_rect.centerx,
                                                   top=enter_name_rect.bottom)
-            texts.append(disclaimer)
 
             textbox = TextBox(screen, TEMP,
                               disclaimer_rect.bottom,
@@ -738,8 +772,12 @@ def play(cb_mode: bool) -> None:
                 width=BACK_WIDTH, height=BACK_HEIGHT,
                 transparent=False)
 
+            # Center the text input box.
             textbox.setX(reason_rect.centerx - textbox.getWidth() * HALF)
 
+            # Need to draw the surface every frame, to keep the antialiasing
+            # on words the words. Equivalent to screen.fill(), except we are
+            # only filling the right side of the screen.
             contain_surface = pygame.Surface((w - board_rect.w, h))
             contain_surface.fill(BLACK)
 
@@ -789,8 +827,8 @@ def play(cb_mode: bool) -> None:
 
         TXT_ADJUST = 10
 
+        # Turn info.
         turn_text = get_font(TXT_SIZE).render("Turn", True, WHITE)
-
         turn_rect = turn_text.get_rect(left=LEFT, bottom=h - BUTTON_GAP)
         side_rect = side_text.get_rect(centerx=turn_rect.centerx,
                                        bottom=turn_rect.top + TXT_ADJUST)
@@ -800,6 +838,7 @@ def play(cb_mode: bool) -> None:
 
         pygame.display.update()
 
+        # Not the users turn
         if board.turn is False:
             start, end = board.engine_move()
             reset_shade()
@@ -833,6 +872,7 @@ def play(cb_mode: bool) -> None:
                                 selected_piece = piece
                                 selected_square = square
                                 valid_moves = piece.valid_moves(board)
+                                # Put dots on the valid locations
                                 for location in valid_moves:
                                     squares[coords_to_index(location
                                                             [:MOVE_LEN])].dot \

@@ -1,5 +1,6 @@
 import pygame
 
+# Colours
 LIGHT = (207, 177, 129)
 DARK = (129, 92, 60)
 DOT_GRAY = (211, 211, 211, 160)
@@ -50,6 +51,13 @@ class Square:
             self.shade_surface.fill(SHADE)
 
     def draw(self, screen: pygame.Surface, image: pygame.Surface = None):
+        """
+        Draws the square onto the screen, with alternative colours, dot, and
+        shading if required.
+        :param screen: The surface to draw to.
+        :param image: The image to place onto the square, if there is one.
+        :return:
+        """
         if not self.cb_colours:
             if self.light:
                 pygame.draw.rect(screen, LIGHT, self.rect)
@@ -76,14 +84,25 @@ class Square:
             screen.blit(self.dot_surface, self.rect)
 
     def check_position(self, position: tuple[int, int]) -> bool:
+        """
+        Returns True if the position given is inside the square.
+        :param position: The position to check, given as tuple[x, y]
+        :return:
+        """
         if (position[0] in range(self.rect.left, self.rect.right) and
                 position[1] in range(self.rect.top, self.rect.bottom)):
             return True
         return False
 
     # For testing
-    def show_coords(self, screen: pygame.Surface, text: pygame.font.Font):
-        text = text.render(f"{self.file}, {self.rank}", True, 'black')
+    def show_coords(self, screen: pygame.Surface, font: pygame.font.Font):
+        """
+        Renders the squares co-ordinates on to the square. Only for testing.
+        :param screen: The screen to render to.
+        :param font: The pygame Font object to render.
+        :return:
+        """
+        text = font.render(f"{self.file}, {self.rank}", True, 'black')
         rect = text.get_rect(center=(self.x_pos + self.w * HALF,
                                      self.y_pos + self.w * HALF))
         screen.blit(text, rect)

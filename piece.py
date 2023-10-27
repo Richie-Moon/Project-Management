@@ -29,9 +29,17 @@ class Piece:
         self.update()
 
     def square(self) -> tuple[int, int]:
+        """
+        Returns the co-ordinates of the current square that the piece is on.
+        :return:
+        """
         return self.file, self.rank
 
     def update(self) -> None:
+        """
+        Updates the pieces internal variables, based on its current position.
+        :return:
+        """
         self.LEFT = False
         self.RIGHT = False
         self.TOP = False
@@ -48,8 +56,11 @@ class Piece:
             self.TOP = True
 
     def can_move(self, square) -> bool:
-        """If there is no piece on the square, or the piece is an enemy
-        piece"""
+        """
+        Checks if the square is empty, or if the piece on it is an enemy piece.
+        :return: Returns True if the square is empty or the piece is an enemy
+         piece.
+        """
         if square is None or square.letter.isupper() is \
                 self.letter.islower():
             return True
@@ -57,12 +68,20 @@ class Piece:
 
     def check_valid_moves(self, moves: list[tuple[int, int]],
                           board) -> list[tuple[int, int]]:
+        """
+        Checks a given list of moves against fully valid moves.
+        :param moves: The moves to check
+        :param board: An instance of board, to get information from.
+        :return: Returns a list of fully valid moves (Moves in both the moves
+        list and the valid moves list).
+        """
 
         valid_moves = pyffish.legal_moves(board.VARIANT, board.START_FEN,
                                           board.moves)
 
         moves_square = []
 
+        # Converts all moves from co-ordinates to squares.
         for i in range(len(moves)):
             moves_square.append(board.coords_to_square(self.file, self.rank)
                                 + board.coords_to_square(*moves[i]))
@@ -88,7 +107,7 @@ class Piece:
                 if square == item[START:FULL_MOVE_LEN]:
                     moves_to_return.append(moves[i])
 
-        # Set to remove duplicates from promotions.
+        # cast to a Set to remove duplicates from promotions.
         return list(set(moves_to_return))
 
     # def print_info(self):
@@ -102,6 +121,11 @@ class Pawn(Piece):
         super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self, board) -> list:
+        """
+        Calculates the valid moves for this Pawn.
+        :param board: The current board instance
+        :return:
+        """
         moves = []
 
         next_square = (self.file, self.rank + 1)
@@ -137,8 +161,14 @@ class Knight(Piece):
         super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self, board) -> list:
+        """
+        Calculates and returns the valid moves for this knight.
+        :param board:
+        :return:
+        """
         moves = []
 
+        # Skip checking for moves on the right if the knight is on the right.
         if not self.RIGHT:
             right = self.file + 1
 
@@ -156,6 +186,7 @@ class Knight(Piece):
                 if self.can_move(on_down_right):
                     moves.append(move_right)
 
+        # Skip checking for moves on the left if the knight is on the left.
         if not self.LEFT:
             left = self.file - 1
 
@@ -173,6 +204,7 @@ class Knight(Piece):
                 if self.can_move(on_down_left):
                     moves.append(move_left)
 
+        # Skip checking for moves above if the knight is on the top rank.
         if not self.TOP:
             up = self.rank + 1
 
@@ -190,6 +222,7 @@ class Knight(Piece):
                 if self.can_move(on_left_up):
                     moves.append(move_up)
 
+        # Skip checking for moves below if the knight is on the bottom rank.
         if not self.BOTTOM:
             down = self.rank - 1
 
@@ -216,6 +249,11 @@ class Rook(Piece):
         super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self, board) -> list:
+        """
+        Calculates and returns the valid moves for this rook
+        :param board: THe current board instance.
+        :return:
+        """
         moves = []
 
         # Check upwards
@@ -289,11 +327,17 @@ class Queen(Piece):
         super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self, board) -> list:
+        """
+        Calculates and returns the valid moves for this queen.
+        :param board: The current board instance
+        :return:
+        """
         moves = []
 
         # Steal rook movement code
         temp_rook = Rook(self.letter, self.file, self.rank, self.image,
                          int(self.w))
+        # Add rooks valid moves to queens moves.
         moves.extend(temp_rook.valid_moves(board))
         del temp_rook
 
@@ -388,8 +432,14 @@ class King(Piece):
         super().__init__(letter, file, rank, image, w)
 
     def valid_moves(self, board) -> list:
+        """
+        Calculates and return the valid moves for this king.
+        :param board: The current board instance.
+        :return:
+        """
         moves = []
 
+        # Skip checking for moves below if the king is on the bottom rank.
         if not self.BOTTOM:
             move_down = self.rank - 1
             moves_down = [(self.file, move_down)]
@@ -403,6 +453,7 @@ class King(Piece):
                 if self.can_move(board.on_square(*move)):
                     moves.append(move)
 
+        # Skip checking for moves above if the king is on the top rank.
         if not self.TOP:
             move_up = self.rank + 1
             moves_up = [(self.file, move_up)]

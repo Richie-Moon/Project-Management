@@ -46,6 +46,7 @@ class Board:
         self.user_side: int = 0
         self.turn = True
 
+        # Start the engine.
         self.engine = engine.Engine(["fairy-stockfish_x86-64-bmi2"])
         self.engine.new_game()
 
@@ -53,6 +54,12 @@ class Board:
         self.w = -1
 
     def new_game(self, w: int) -> None:
+        """
+        Starts a new game and resets the internal variables.
+        :param w: The width of each square. Not used in this function,
+        but necessary for Initialising pieces.
+        :return:
+        """
         # Reset instance variables.
         self.board = []
         self.moves = []
@@ -91,21 +98,23 @@ class Board:
                     empty_squares = int(item)
                     rank_list.extend([None] * empty_squares)
                 except ValueError:
-                    if item.isupper():
+                    if item.isupper():  # Piece should be white
                         path = "assets/pieces/white/"
-                    else:
+                    else:  # Piece should be black
                         path = "assets/pieces/black/"
+
                     img = pygame.image.load(f"{path}{item}.svg")
-                    rank_list.append(self.LETTER_TO_PIECE
-                                     [item.lower()]
-                                     (item, len(rank_list), i, img, self.w))
+                    # Create an instance of the required piece.
+                    rank_list.append(
+                        self.LETTER_TO_PIECE[item.lower()]
+                        (item, len(rank_list), i, img, self.w))
 
             self.board.append(rank_list)
 
     def move(self, start: tuple[int, int], end: tuple[int, int],
              engine_promote: str | None = None) -> Type[Piece] | None:
         """
-
+        Make a move on the internal board.
         :param start: The co-ordinates of the piece to move.
         :param end: The co-ordinates of where the piece should move to.
         :param engine_promote: Whether the engine move is a promotion. If it
@@ -143,16 +152,18 @@ class Board:
 
             img = pygame.image.load(f"assets/pieces/{side}/{letter}.svg")
 
+            # Make move on board.
             self.board[s_rank][s_file], self.board[e_rank][e_file] = None, \
                 self.LETTER_TO_PIECE[letter.lower()](
                     letter, e_file, e_rank, img, self.w)
 
-        else:
+        else:  # No promotion
             promote = False
             self.board[s_rank][s_file], self.board[e_rank][
                 e_file] = None, piece
 
         if self.turn:
+            # Convert moves to LAN and append to self.moves.
             start_square = self.coords_to_square(s_file, s_rank)
             end_square = self.coords_to_square(e_file, e_rank)
             if self.user_side == 1:
@@ -166,14 +177,22 @@ class Board:
 
             self.moves.append(move)
 
+        # Update board FEN based on current moves.
         self.board_fen = pyffish.get_fen(self.VARIANT, self.START_FEN,
                                          self.moves)
         self.engine.update(self.board_fen)
 
+        # Switch sides
         self.turn = not self.turn
         return captured
 
     def engine_move(self) -> tuple[tuple[int, int], tuple[int, int]]:
+        """
+        Gets the best move from the engine. Calls self.move() to make the move
+        on the board.
+        :return: Returns a tuple containing the co-ordinates of the start and
+        end squares.
+        """
         best_move = self.engine.get_move()
 
         if len(best_move) == PROMOTION_LENGTH:
@@ -189,6 +208,7 @@ class Board:
 
         self.moves.append(best_move)
         if self.user_side == 1:
+            # If the user is playing black, the moves need to be switched
             start_coords = self.switch_side(start_coords)
             end_coords = self.switch_side(end_coords)
 
@@ -238,7 +258,8 @@ class Board:
 
     def switch_side_square(self, square: str) -> str:
         """
-
+        Same as switch_side, but switches given a square, not co-ordinates.
+        Also returns a square.
         :param square: The square to switch side
         :return: The switched square
         """
@@ -248,6 +269,11 @@ class Board:
         return self.coords_to_square(new_file, new_rank)
 
     def square_to_coords(self, square: str) -> tuple[int, int]:
+        """
+        Calculates the co-ordinates of a square.
+        :param square: The square to convert
+        :return: Returns the corresponding co-ordinates of the square.
+        """
         file = self.FILE_TO_NUM[square[0]]
         rank = int(square[1]) - 1
         return file, rank
@@ -306,6 +332,11 @@ class Board:
         return None
 
     def print_board(self):
+        """
+        Prints the current board to the console. Empty squares are printed as
+        zeroes. Only for testing purposes.
+        :return:
+        """
         for rank in self.board:
             txt = ""
             for file in rank:

@@ -97,13 +97,26 @@ class ImageButton(Button):
         self.base_colour_record = self.bg_base_colour
 
     def update(self, screen: pygame.Surface) -> None:
+        """
+        Updates and blits the button onto the screen.
+        :param screen: The surface to blit to.
+        :return:
+        """
         super().update(screen)
         screen.blit(self.image, self.rect)
         # screen.blit(self.text, self.text_rect)
 
     def enable(self):
+        """
+        Change button bg to green
+        :return:
+        """
         green = (0, 150, 0)
         self.bg_base_colour = green
 
     def disable(self):
+        """
+        Change button bg to default colour.
+        :return:
+        """
         self.bg_base_colour = self.base_colour_record
