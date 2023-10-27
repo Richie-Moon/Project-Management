@@ -1,3 +1,6 @@
+import datetime
+import os
+
 import pygame
 import sys
 import ctypes
@@ -7,6 +10,7 @@ import board
 import pygame_widgets
 from pygame_widgets.slider import Slider
 from pygame_widgets.toggle import Toggle
+from pygame_widgets.textbox import TextBox
 from game import Square
 import numpy as np
 
@@ -33,6 +37,11 @@ HEIGHT: int = 160
 MENU_BUTTON_WIDTH: int = 530
 MENU_BUTTON_HEIGHT: int = 150
 MENU_TEXT_SIZE: int = 50
+
+BACK_POS = (150, 100)
+BACK_WIDTH = 250
+BACK_HEIGHT = 100
+BACK_FONT_SIZE = 50
 
 NUM_FILES = 6
 NUM_RANKS = 6
@@ -143,14 +152,14 @@ def display_title(line1: str, line2: str,
 
 blurred_bg_scaled, blurred_bg_rect = scale_image(blurred_bg, (w, h))
 
-back_button = Button(pos=(150, 100), text_input="Back",
-                     font=get_font(50, "SemiBold"),
+back_button = Button(pos=BACK_POS, text_input="Back",
+                     font=get_font(BACK_FONT_SIZE, "SemiBold"),
                      base_colour=TEXT_BASE_COLOUR,
                      hover_colour=TEXT_HOVER_COLOUR,
                      bg_base_colour=BUTTON_BASE_COLOUR,
                      bg_hover_colour=BUTTON_HOVER_COLOUR,
-                     width=250,
-                     height=100,
+                     width=BACK_WIDTH,
+                     height=BACK_HEIGHT,
                      transparent=True)
 
 
@@ -371,9 +380,9 @@ def settings(from_play: bool) -> None:
         slider_text_rect = slider_value_text.get_rect(
             center=(w * HALF, slider.get('y') + BUTTON_GAP * DOUBLE))
 
-        for event in pygame.event.get():
-            pygame_widgets.update(event)
-
+        events = pygame.event.get()
+        pygame_widgets.update(events)
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -423,6 +432,7 @@ def settings(from_play: bool) -> None:
             # Has to be indented so that the slider draws first
             # (otherwise causes flickering)
             pygame.display.update()
+
 
 
 def tutorial():
@@ -573,6 +583,42 @@ def play(cb_mode: bool) -> None:
         for sq in squares:
             sq.shade = False
 
+    def save_game(name: str, game_result: int, end_reason: str) -> None:
+        path = "games"
+        num_games = len(os.listdir(path))
+        datetime_now = datetime.datetime.now()
+
+        formatted_date = datetime_now.strftime("%d %B %Y")
+        formatted_time = datetime_now.strftime("%I:%M.%S %p")
+
+        if not bool(board.user_side):
+            white = name
+            black = "Fairy-Stockfish"
+        else:
+            white = "Fairy-Stockfish"
+            black = name
+
+        if game_result == DRAW:
+            winner = "Draw "
+        elif game_result == WHITE_WIN:
+            winner = "White wins "
+        else:
+            winner = "Black wins "
+
+        with open(f"{path}/{name}{num_games + 1}.txt", 'x') as file:
+            file.write(f"User: {name}\n\n")
+            file.write(f"Date: {formatted_date}\n")
+            file.write(f"Time: {formatted_time}\n\n")
+            file.write(f"Engine ELO: {board.engine.elo}\n\n")
+            file.write(f"White: {white}\n")
+            file.write(f"Black: {black}\n")
+            file.write(f"Result: {winner}{end_reason}\n\n")
+
+            count = 1
+            for move in board.moves:
+                file.write(f"{count}. {move} ")
+                count += 1
+
     screen.fill(BLACK)
 
     pygame.display.set_caption("Play")
@@ -611,6 +657,9 @@ def play(cb_mode: bool) -> None:
     engine_captured = []
 
     TXT_SIZE = 70
+    WHITE_WIN = 0
+    BLACK_WIN = 1
+    DRAW = -1
 
     while True:
         screen.fill(BLACK)
@@ -626,6 +675,100 @@ def play(cb_mode: bool) -> None:
                 square.draw(screen)
 
         LEFT = board_rect.right + BUTTON_GAP * DOUBLE
+
+        game_end = board.check_end_game()
+        if game_end is not None:
+            result = game_end['result']
+            reason = game_end['reason']
+            texts = []
+
+            # The user won
+            if (result == WHITE_WIN and board.user_side == 0) or \
+                    (result == BLACK_WIN and board.user_side == 1):
+                win = "YOU WIN!"
+                col = (124, 252, 0)
+            elif result == DRAW:
+                win = "Draw"
+                col = (130, 130, 130)
+            else:
+                win = "You lose"
+                col = (255, 0, 0)
+
+            reason_text = get_font(MENU_TEXT_SIZE).render(reason, True, WHITE)
+            reason_rect = reason_text.get_rect(left=LEFT, centery=h * HALF)
+            texts.append(reason_text)
+
+            win_text = get_font(TXT_SIZE, "SemiBold").render(win, True, col)
+            win_rect = win_text.get_rect(centerx=reason_rect.centerx,
+                                         bottom=reason_rect.top)
+            texts.append(win_text)
+
+            GRAY = (70, 70, 70)
+            LIGHT_GRAY = (140, 140, 140)
+            TEMP = 0
+            SMALL_FONT_SIZE = 30
+
+            enter_name = get_font(SMALL_FONT_SIZE).render("Enter Name: ", True,
+                                                          WHITE)
+            enter_name_rect = enter_name.get_rect(centerx=reason_rect.centerx,
+                                                  top=reason_rect.bottom)
+            texts.append(enter_name)
+
+            disclaimer = get_font(SMALL_FONT_SIZE).render(
+                "Do not give sensitive information", True, WHITE)
+            disclaimer_rect = disclaimer.get_rect(centerx=reason_rect.centerx,
+                                                  top=enter_name_rect.bottom)
+            texts.append(disclaimer)
+
+            textbox = TextBox(screen, TEMP,
+                              disclaimer_rect.bottom,
+                              BACK_WIDTH, BACK_HEIGHT,
+                              font=get_font(MENU_TEXT_SIZE),
+                              colour=LIGHT_GRAY, textColour=WHITE)
+
+            save_exit_button = Button(
+                pos=(reason_rect.centerx,
+                     textbox.getY() + BUTTON_GAP * 4),
+                text_input="Save Game",
+                font=get_font(MENU_TEXT_SIZE),
+                base_colour=TEXT_BASE_COLOUR,
+                hover_colour=TEXT_HOVER_COLOUR,
+                bg_base_colour=GRAY,
+                bg_hover_colour=LIGHT_GRAY,
+                width=BACK_WIDTH, height=BACK_HEIGHT,
+                transparent=False)
+
+            textbox.setX(reason_rect.centerx - textbox.getWidth() * HALF)
+
+            contain_surface = pygame.Surface((w - board_rect.w, h))
+            contain_surface.fill(BLACK)
+
+            while True:
+                mouse_pos = pygame.mouse.get_pos()
+
+                screen.blit(contain_surface, (board_rect.right, 0))
+
+                save_exit_button.update(screen)
+                save_exit_button.change_colour(mouse_pos)
+
+                screen.blit(win_text, win_rect)
+                screen.blit(reason_text, reason_rect)
+                screen.blit(enter_name, enter_name_rect)
+                screen.blit(disclaimer, disclaimer_rect)
+
+                events = pygame.event.get()
+                for event in events:
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        # Button clicked
+                        if save_exit_button.check_position(mouse_pos):
+                            save_game(textbox.getText(), result, reason)
+                            textbox.hide()
+                            return
+                pygame_widgets.update(events)
+                pygame.display.update()
 
         # Display Engine Info
         info_text = get_font(TXT_SIZE).render("Fairy-Stockfish", True, WHITE)
@@ -643,6 +786,7 @@ def play(cb_mode: bool) -> None:
 
         else:
             side_text = get_font(TXT_SIZE).render("Opponent", True, WHITE)
+
         TXT_ADJUST = 10
 
         turn_text = get_font(TXT_SIZE).render("Turn", True, WHITE)
@@ -655,10 +799,6 @@ def play(cb_mode: bool) -> None:
         screen.blit(turn_text, turn_rect)
 
         pygame.display.update()
-
-        if board.check_end_game() is not None:
-            # TODO Endgame
-            return
 
         if board.turn is False:
             start, end = board.engine_move()
@@ -694,8 +834,9 @@ def play(cb_mode: bool) -> None:
                                 selected_square = square
                                 valid_moves = piece.valid_moves(board)
                                 for location in valid_moves:
-                                    squares[coords_to_index
-                                            (location[:MOVE_LEN])].dot = True
+                                    squares[coords_to_index(location
+                                                            [:MOVE_LEN])].dot \
+                                        = True
 
                         if square.dot:
                             # move selected piece to dot.

@@ -266,8 +266,8 @@ class Board:
         function?
         :return: Returns a dict with keys `result` and `reason`. `result` is
          an integer, where -1 means draw, 0 means white wins, and 1 means
-         black wins. `reason` is the reason for the result (i.e. Checkmate or
-         Draw by insufficient Material).
+         black wins. `reason` is the reason for the result (i.e. Checkmate,
+         Draw by insufficient Material, etc).
         """
         DRAW = -1
         WHITE_WIN = 0
@@ -280,7 +280,7 @@ class Board:
                                                              [])
         if insufficient_mat == (True, True):
             return_dict['result'] = DRAW
-            return_dict['reason'] = "Draw by Insufficient Material"
+            return_dict['reason'] = "By Insufficient Material"
             return return_dict
 
         gives_check = pyffish.gives_check(self.VARIANT, self.START_FEN,
@@ -288,12 +288,12 @@ class Board:
         # Stalemate
         if len(self.board_valid_moves()) == 0 and not gives_check:
             return_dict["result"] = DRAW
-            return_dict["reason"] = "Draw by Stalemate"
+            return_dict["reason"] = "By Stalemate"
             return return_dict
 
         # Checkmate
         if gives_check and len(self.board_valid_moves()) == 0:
-            return_dict['reason'] = 'CHECKMATE'
+            return_dict['reason'] = 'By Checkmate'
             is_white = not bool(self.user_side)
 
             if (self.turn and is_white) or (not self.turn and not is_white):

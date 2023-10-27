@@ -5,7 +5,8 @@ DARK = (129, 92, 60)
 DOT_GRAY = (211, 211, 211, 160)
 DARK_GRAY = (69, 69, 69)
 LIGHT_GRAY = (130, 130, 130)
-SHADE = (255, 255, 255, 70)
+SHADE = (255, 255, 100, 70)
+SHADE_CB = (51, 51, 230, 70)
 
 HALF = 0.5
 CIRCLE_RADIUS = 5
@@ -43,7 +44,10 @@ class Square:
         # Surface for dot (required for transparency).
         self.dot_surface = pygame.Surface((w, w), pygame.SRCALPHA)
         self.shade_surface = pygame.Surface((w, w), pygame.SRCALPHA)
-        self.shade_surface.fill(SHADE)
+        if self.cb_colours:
+            self.shade_surface.fill(SHADE_CB)
+        else:
+            self.shade_surface.fill(SHADE)
 
     def draw(self, screen: pygame.Surface, image: pygame.Surface = None):
         if not self.cb_colours:
