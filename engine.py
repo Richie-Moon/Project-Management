@@ -82,8 +82,8 @@ class Engine:
         """
         :param fen: The FEN string of the current position.
         """
-        print(fen)
         self.write(f"position fen {fen}")
+        # Need this here to work??? IDK why.
         self.write('d\n')
 
     def get_move(self) -> str:

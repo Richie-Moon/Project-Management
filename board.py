@@ -303,7 +303,6 @@ class Board:
                 return_dict['result'] = WHITE_WIN
 
             return return_dict
-
         return None
 
     def print_board(self):

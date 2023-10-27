@@ -220,6 +220,7 @@ def main_menu() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 if play_button.check_position(mouse_pos) is True:
                     settings(from_play=True)
@@ -355,32 +356,31 @@ def settings(from_play: bool) -> None:
         # Side selection setting
         side_select_text = get_font(MENU_TEXT_SIZE).render("Side Select",
                                                            True, WHITE)
-        side_select_rect = side_select_text.get_rect(center=(w * HALF,
-                                                             side_white.y_pos
-                                                             - BUTTON_GAP *
-                                                             DOUBLE))
+        side_select_rect = side_select_text.get_rect(
+            center=(w * HALF, side_white.y_pos - BUTTON_GAP * DOUBLE))
 
         # Engine Difficulty Setting
         difficulty_text = get_font(MENU_TEXT_SIZE).render("Engine Difficulty",
                                                           True, WHITE)
-        difficulty_text_rect = difficulty_text.get_rect(center=(w * HALF,
-                                                                slider.get('y')
-                                                                - BUTTON_GAP))
+        difficulty_text_rect = difficulty_text.get_rect(
+            center=(w * HALF, slider.get('y') - BUTTON_GAP))
+
         slider_value_text = get_font(MENU_TEXT_SIZE).render(str(
             slider.getValue()), True, 'white')
-        slider_text_rect = slider_value_text.get_rect(center=(w * HALF,
-                                                              slider.get('y') +
-                                                              BUTTON_GAP *
-                                                              DOUBLE))
+
+        slider_text_rect = slider_value_text.get_rect(
+            center=(w * HALF, slider.get('y') + BUTTON_GAP * DOUBLE))
 
         for event in pygame.event.get():
             pygame_widgets.update(event)
 
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONUP:
                 # Back buttons pressed
                 if back_button.check_position(mouse_pos) is True:
+                    toggle.hide()
                     slider.hide()
                     return
 
@@ -552,6 +552,7 @@ def tutorial():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 if back_button.check_position(mouse_pos):
                     return
@@ -609,6 +610,8 @@ def play(cb_mode: bool) -> None:
     user_captured = []
     engine_captured = []
 
+    TXT_SIZE = 70
+
     while True:
         screen.fill(BLACK)
 
@@ -622,19 +625,31 @@ def play(cb_mode: bool) -> None:
                 square.has_piece = False
                 square.draw(screen)
 
+        LEFT = board_rect.right + BUTTON_GAP * DOUBLE
+
+        # Display Engine Info
+        info_text = get_font(TXT_SIZE).render("Fairy-Stockfish", True, WHITE)
+        info_rect = info_text.get_rect(left=LEFT, top=BUTTON_GAP * DOUBLE)
+        screen.blit(info_text, info_rect)
+
+        elo_text = get_font(MENU_TEXT_SIZE).render(f"ELO: {board.engine.elo}",
+                                                   True, WHITE)
+        elo_rect = elo_text.get_rect(left=LEFT, top=info_rect.bottom)
+        screen.blit(elo_text, elo_rect)
+
+        # Display Turn
         if board.turn:
-            side_text = get_font(MENU_TEXT_SIZE).render("Your", True, WHITE)
+            side_text = get_font(TXT_SIZE).render("Your", True, WHITE)
 
         else:
-            side_text = get_font(MENU_TEXT_SIZE).render("Opponent", True, WHITE)
-
-        side_rect = side_text.get_rect(left=board_rect.right + BUTTON_GAP,
-                                       top=BUTTON_GAP)
-
-        turn_text = get_font(MENU_TEXT_SIZE).render("Turn", True, WHITE)
+            side_text = get_font(TXT_SIZE).render("Opponent", True, WHITE)
         TXT_ADJUST = 10
-        turn_rect = turn_text.get_rect(centerx=side_rect.centerx,
-                                       top=side_rect.bottom - TXT_ADJUST)
+
+        turn_text = get_font(TXT_SIZE).render("Turn", True, WHITE)
+
+        turn_rect = turn_text.get_rect(left=LEFT, bottom=h - BUTTON_GAP)
+        side_rect = side_text.get_rect(centerx=turn_rect.centerx,
+                                       bottom=turn_rect.top + TXT_ADJUST)
 
         screen.blit(side_text, side_rect)
         screen.blit(turn_text, turn_rect)
@@ -661,6 +676,7 @@ def play(cb_mode: bool) -> None:
 
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_pos = pygame.mouse.get_pos()

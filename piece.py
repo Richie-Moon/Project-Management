@@ -3,6 +3,7 @@ import pyffish
 
 END = 2
 FULL_MOVE_LEN = 4
+START = 0
 
 
 class Piece:
@@ -84,7 +85,7 @@ class Piece:
                 square = move
 
             for item in valid_moves:
-                if square == item[0:FULL_MOVE_LEN]:
+                if square == item[START:FULL_MOVE_LEN]:
                     moves_to_return.append(moves[i])
 
         # Set to remove duplicates from promotions.
