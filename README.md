@@ -2,9 +2,9 @@
 Los Alamos Chess Variant
 
 # Notes
-Only works/only tested on Windows. (Probably) will not word on other OS's. 
+Only works/only tested on Windows. Will not work on other OS's. 
 
-Only run through IDLE, not VSCode. 
+Only run through IDLE, not VSCode, as VSCode has some path and directory issues. 
 
 # Credits
 [Fairy Stockfish](https://github.com/fairy-stockfish/Fairy-Stockfish)
@@ -17,6 +17,6 @@ Only run through IDLE, not VSCode.
 
 [GUI Guide](https://github.com/baraltech/Menu-System-PyGame)
 
-[Font](https://fonts.google.com/specimen/Ruwudu?preview.text=Mini%20Chess&preview.text_type=custom)
+[Font - Ruwudu](https://fonts.google.com/specimen/Ruwudu?preview.text=Mini%20Chess&preview.text_type=custom)
 
 [Chess Pieces from Wikimedia](https://commons.wikimedia.org/wiki/File:Chess_klt45.svg)
