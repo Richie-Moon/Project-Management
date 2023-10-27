@@ -715,7 +715,7 @@ def play(cb_mode: bool) -> None:
             texts.append(enter_name)
 
             disclaimer = get_font(SMALL_FONT_SIZE).render(
-                "Do not give sensitive information", True, WHITE)
+                "Do not enter sensitive information", True, WHITE)
             disclaimer_rect = disclaimer.get_rect(centerx=reason_rect.centerx,
                                                   top=enter_name_rect.bottom)
             texts.append(disclaimer)
